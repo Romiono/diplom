@@ -1,0 +1,49 @@
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Body,
+  UseGuards,
+  ForbiddenException,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtPayload } from '../../common/interfaces/request-with-user.interface';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+
+@Controller('users')
+@UseGuards(JwtAuthGuard)
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get(':id')
+  async getProfile(@Param('id') id: string) {
+    return this.usersService.getProfile(id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    // Users can only update their own profile
+    if (user.sub !== id && !user.isAdmin) {
+      throw new ForbiddenException('You can only update your own profile');
+    }
+
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @Get(':id/stats')
+  async getUserStats(@Param('id') id: string) {
+    const user = await this.usersService.findOne(id);
+    return {
+      rating: user.rating,
+      totalSales: user.total_sales,
+      totalPurchases: user.total_purchases,
+    };
+  }
+}

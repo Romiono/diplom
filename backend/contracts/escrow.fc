@@ -1,0 +1,204 @@
+;; TON Marketplace Escrow Smart Contract
+;; Secure escrow for peer-to-peer transactions
+
+#include "imports/stdlib.fc";
+
+;; Storage structure:
+;; seller_address: MsgAddressInt - продавец
+;; buyer_address: MsgAddressInt - покупатель
+;; amount: int - сумма сделки в nanotons
+;; timeout: int - таймаут для автовозврата (unix timestamp)
+;; status: int - статус контракта (0=CREATED, 1=FUNDED, 2=RELEASED, 3=REFUNDED)
+;; admin_address: MsgAddressInt - адрес админа для разрешения споров
+
+;; Status constants
+const int STATUS_CREATED = 0;
+const int STATUS_FUNDED = 1;
+const int STATUS_RELEASED = 2;
+const int STATUS_REFUNDED = 3;
+
+;; Error codes
+const int ERROR_NOT_FUNDED = 100;
+const int ERROR_ALREADY_COMPLETED = 101;
+const int ERROR_UNAUTHORIZED = 102;
+const int ERROR_INSUFFICIENT_AMOUNT = 103;
+const int ERROR_TIMEOUT_NOT_REACHED = 104;
+
+;; Load contract storage
+(slice, slice, int, int, int, slice) load_data() inline {
+    slice ds = get_data().begin_parse();
+    return (
+        ds~load_msg_addr(),  ;; seller_address
+        ds~load_msg_addr(),  ;; buyer_address
+        ds~load_coins(),      ;; amount
+        ds~load_uint(32),     ;; timeout
+        ds~load_uint(8),      ;; status
+        ds~load_msg_addr()    ;; admin_address
+    );
+}
+
+;; Save contract storage
+() save_data(slice seller, slice buyer, int amount, int timeout, int status, slice admin) impure inline {
+    set_data(
+        begin_cell()
+            .store_slice(seller)
+            .store_slice(buyer)
+            .store_coins(amount)
+            .store_uint(timeout, 32)
+            .store_uint(status, 8)
+            .store_slice(admin)
+            .end_cell()
+    );
+}
+
+;; Send TON with message
+() send_ton(slice to_address, int amount, int mode, cell body) impure inline {
+    var msg = begin_cell()
+        .store_uint(0x18, 6)
+        .store_slice(to_address)
+        .store_coins(amount)
+        .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+        .store_ref(body);
+    send_raw_message(msg.end_cell(), mode);
+}
+
+;; Main contract receiver
+() recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) {
+        return (); ;; Ignore empty messages
+    }
+
+    slice cs = in_msg_full.begin_parse();
+    int flags = cs~load_uint(4);
+
+    if (flags & 1) {
+        return (); ;; Ignore bounced messages
+    }
+
+    slice sender_address = cs~load_msg_addr();
+
+    ;; Load contract data
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+
+    int op = in_msg_body~load_uint(32);
+
+    ;; OP codes:
+    ;; 1 = fund (buyer sends payment)
+    ;; 2 = release (buyer confirms receipt or admin resolves)
+    ;; 3 = refund (admin resolves or auto-refund by timeout)
+    ;; 4 = get_state (query contract state)
+
+    if (op == 1) { ;; FUND - buyer sends payment
+        throw_unless(ERROR_UNAUTHORIZED, equal_slices(sender_address, buyer));
+        throw_unless(ERROR_ALREADY_COMPLETED, status == STATUS_CREATED);
+        throw_unless(ERROR_INSUFFICIENT_AMOUNT, msg_value >= amount);
+
+        ;; Update status to FUNDED
+        save_data(seller, buyer, amount, timeout, STATUS_FUNDED, admin);
+
+        ;; Return excess if overpaid
+        if (msg_value > amount) {
+            int excess = msg_value - amount;
+            send_ton(buyer, excess, 1, begin_cell().store_uint(0, 32).store_slice("Excess returned").end_cell());
+        }
+
+        return ();
+    }
+
+    if (op == 2) { ;; RELEASE - transfer funds to seller
+        ;; Can be called by buyer or admin
+        int is_authorized = equal_slices(sender_address, buyer) | equal_slices(sender_address, admin);
+        throw_unless(ERROR_UNAUTHORIZED, is_authorized);
+        throw_unless(ERROR_NOT_FUNDED, status == STATUS_FUNDED);
+
+        ;; Update status to RELEASED
+        save_data(seller, buyer, amount, timeout, STATUS_RELEASED, admin);
+
+        ;; Send funds to seller (keep small amount for storage fee)
+        int seller_amount = amount - 10000000; ;; Reserve 0.01 TON for gas
+        send_ton(seller, seller_amount, 1, begin_cell().store_uint(0, 32).store_slice("Payment released").end_cell());
+
+        return ();
+    }
+
+    if (op == 3) { ;; REFUND - return funds to buyer
+        int current_time = now();
+
+        ;; Can be called by admin OR by anyone after timeout
+        int is_admin = equal_slices(sender_address, admin);
+        int is_timeout = current_time > timeout;
+
+        throw_unless(ERROR_UNAUTHORIZED, is_admin | is_timeout);
+        throw_unless(ERROR_NOT_FUNDED, status == STATUS_FUNDED);
+
+        if (~ is_admin) {
+            throw_unless(ERROR_TIMEOUT_NOT_REACHED, is_timeout);
+        }
+
+        ;; Update status to REFUNDED
+        save_data(seller, buyer, amount, timeout, STATUS_REFUNDED, admin);
+
+        ;; Send funds back to buyer
+        int refund_amount = amount - 10000000; ;; Reserve 0.01 TON for gas
+        send_ton(buyer, refund_amount, 1, begin_cell().store_uint(0, 32).store_slice("Payment refunded").end_cell());
+
+        return ();
+    }
+
+    if (op == 4) { ;; GET_STATE - return contract state
+        ;; This is handled by get methods, not internal messages
+        return ();
+    }
+
+    ;; Unknown operation
+    throw(0xffff);
+}
+
+;; GET methods
+
+;; Get contract status
+int get_status() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return status;
+}
+
+;; Get contract data
+(slice, slice, int, int, int, slice) get_contract_data() method_id {
+    return load_data();
+}
+
+;; Get seller address
+slice get_seller() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return seller;
+}
+
+;; Get buyer address
+slice get_buyer() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return buyer;
+}
+
+;; Get amount
+int get_amount() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return amount;
+}
+
+;; Get timeout
+int get_timeout() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return timeout;
+}
+
+;; Check if timeout has passed
+int is_timeout_passed() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return now() > timeout;
+}
+
+;; Get admin address
+slice get_admin() method_id {
+    var (seller, buyer, amount, timeout, status, admin) = load_data();
+    return admin;
+}

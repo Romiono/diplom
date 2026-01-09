@@ -1,0 +1,15 @@
+import { IsString, IsInt, Min, Max, IsOptional, IsUUID } from 'class-validator';
+
+export class CreateReviewDto {
+  @IsUUID()
+  transaction_id: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  rating: number;
+
+  @IsOptional()
+  @IsString()
+  comment?: string;
+}

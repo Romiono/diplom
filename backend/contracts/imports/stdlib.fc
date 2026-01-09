@@ -1,0 +1,51 @@
+;; Standard library imports for FunC
+;; This file provides basic TON blockchain functions
+
+;; Cell manipulation
+cell begin_cell() asm "NEWC";
+builder store_ref(builder b, cell c) asm(c b) "STREF";
+builder store_uint(builder b, int x, int len) asm(x b len) "STUX";
+builder store_int(builder b, int x, int len) asm(x b len) "STIX";
+builder store_slice(builder b, slice s) asm "STSLICER";
+builder store_coins(builder b, int x) asm "STGRAMS";
+cell end_cell(builder b) asm "ENDC";
+
+;; Slice manipulation
+slice begin_parse(cell c) asm "CTOS";
+int slice_empty?(slice s) asm "SEMPTY";
+(slice, int) load_uint(slice s, int len) asm(s len -> 1 0) "LDUX";
+(slice, int) load_int(slice s, int len) asm(s len -> 1 0) "LDIX";
+(slice, slice) load_msg_addr(slice s) asm(s -> 1 0) "LDMSGADDR";
+(slice, int) load_coins(slice s) asm(s -> 1 0) "LDGRAMS";
+(slice, cell) load_ref(slice s) asm(s -> 1 0) "LDREF";
+
+;; Storage
+cell get_data() asm "c4 PUSH";
+() set_data(cell c) impure asm "c4 POP";
+
+;; Messages
+() send_raw_message(cell msg, int mode) impure asm "SENDRAWMSG";
+
+;; Time
+int now() asm "NOW";
+
+;; Comparison
+int equal_slices(slice a, slice b) asm "SDEQ";
+
+;; Math
+int min(int a, int b) asm "MIN";
+int max(int a, int b) asm "MAX";
+
+;; Exceptions
+() throw(int excno) impure asm "THROW";
+() throw_if(int excno, int cond) impure asm "THROWIF";
+() throw_unless(int excno, int cond) impure asm "THROWIFNOT";
+
+;; Tuples (for complex data structures)
+forall X -> (tuple, X) ~tpop(tuple t) asm "TPOP";
+forall X -> (tuple, ()) ~tpush(tuple t, X value) asm "TPUSH";
+
+;; Address utilities
+int check_signature(int hash, slice signature, int public_key) asm "CHKSIGNU";
+int cell_hash(cell c) asm "HASHCU";
+int slice_hash(slice s) asm "HASHSU";
