@@ -4,14 +4,17 @@ import {
   Post,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { OpenDisputeDto } from './dto/open-dispute.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtPayload } from '../../common/interfaces/request-with-user.interface';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { AdminGuard } from '../../common/guards/admin.guard';
 
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
@@ -23,17 +26,29 @@ export class TransactionsController {
     @Body() createTransactionDto: CreateTransactionDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.transactionsService.create(user.sub, createTransactionDto);
+    return this.transactionsService.create(
+      user.sub,
+      user.walletAddress,
+      createTransactionDto,
+    );
   }
 
   @Get()
-  async getUserTransactions(@CurrentUser() user: JwtPayload) {
-    return this.transactionsService.getUserTransactions(user.sub);
+  async getUserTransactions(
+    @CurrentUser() user: JwtPayload,
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+  ) {
+    return this.transactionsService.getUserTransactions(
+      user.sub,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.transactionsService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.transactionsService.findOne(id, user.sub);
   }
 
   @Post(':id/confirm')
@@ -53,5 +68,15 @@ export class TransactionsController {
   ) {
     await this.transactionsService.openDispute(id, user.sub, openDisputeDto);
     return { message: 'Dispute opened successfully' };
+  }
+
+  @Post(':id/payment')
+  @UseGuards(AdminGuard)
+  async updatePaymentStatus(
+    @Param('id') id: string,
+    @Body() updatePaymentDto: UpdatePaymentDto,
+  ) {
+    await this.transactionsService.updatePaymentStatus(id, updatePaymentDto);
+    return { message: 'Payment status updated successfully' };
   }
 }

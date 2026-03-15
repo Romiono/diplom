@@ -11,9 +11,11 @@ import { TransactionHistory } from './entities/transaction-history.entity';
 import { Listing, ListingStatus } from '../listings/entities/listing.entity';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { OpenDisputeDto } from './dto/open-dispute.dto';
+import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { EscrowService } from '../blockchain/services/escrow.service';
 import { ListingsService } from '../listings/listings.service';
 import { UsersService } from '../users/users.service';
+import { PaginatedResult } from '../../common/interfaces/pagination.interface';
 
 @Injectable()
 export class TransactionsService {
@@ -31,6 +33,7 @@ export class TransactionsService {
 
   async create(
     buyerId: string,
+    buyerWalletAddress: string,
     createTransactionDto: CreateTransactionDto,
   ): Promise<Transaction> {
     const { listing_id } = createTransactionDto;
@@ -53,18 +56,27 @@ export class TransactionsService {
       throw new BadRequestException('Cannot buy your own listing');
     }
 
-    // Reserve listing
-    await this.listingsService.reserveListing(listing_id);
+    // Atomically reserve listing — fails if already reserved/sold
+    const reserved = await this.listingsService.reserveListing(listing_id);
+    if (!reserved) {
+      throw new BadRequestException('Listing is no longer available');
+    }
 
-    // Deploy escrow contract
-    const escrowAddress = await this.escrowService.deployEscrow({
-      sellerAddress: listing.seller.wallet_address,
-      buyerAddress: buyerId, // In production, get buyer wallet address
-      amount: Number(listing.price),
-      timeoutSeconds: 30 * 24 * 60 * 60, // 30 days
-    });
+    // Deploy escrow contract — rollback reservation on failure
+    let escrowAddress: string;
+    try {
+      escrowAddress = await this.escrowService.deployEscrow({
+        sellerAddress: listing.seller.wallet_address,
+        buyerAddress: buyerWalletAddress,
+        amount: Number(listing.price),
+        timeoutSeconds: 30 * 24 * 60 * 60, // 30 days
+      });
+    } catch (err) {
+      await this.listingsService.unreserveListing(listing_id);
+      throw err;
+    }
 
-    // Create transaction
+    // Create transaction record
     const transaction = this.transactionRepository.create({
       listing_id,
       buyer_id: buyerId,
@@ -76,13 +88,18 @@ export class TransactionsService {
 
     const savedTransaction = await this.transactionRepository.save(transaction);
 
-    // Log history
-    await this.logHistory(savedTransaction.id, null, null, TransactionStatus.PENDING, 'Transaction created');
+    await this.logHistory(
+      savedTransaction.id,
+      null,
+      null,
+      TransactionStatus.PENDING,
+      'Transaction created',
+    );
 
     return savedTransaction;
   }
 
-  async findOne(id: string): Promise<Transaction> {
+  async findOne(id: string, requestingUserId?: string): Promise<Transaction> {
     const transaction = await this.transactionRepository.findOne({
       where: { id },
       relations: ['buyer', 'seller', 'listing'],
@@ -92,15 +109,41 @@ export class TransactionsService {
       throw new NotFoundException('Transaction not found');
     }
 
+    if (
+      requestingUserId !== undefined &&
+      transaction.buyer_id !== requestingUserId &&
+      transaction.seller_id !== requestingUserId
+    ) {
+      throw new ForbiddenException(
+        'You do not have access to this transaction',
+      );
+    }
+
     return transaction;
   }
 
-  async getUserTransactions(userId: string): Promise<Transaction[]> {
-    return this.transactionRepository.find({
+  async getUserTransactions(
+    userId: string,
+    page = 1,
+    limit = 20,
+  ): Promise<PaginatedResult<Transaction>> {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.transactionRepository.findAndCount({
       where: [{ buyer_id: userId }, { seller_id: userId }],
       relations: ['listing', 'buyer', 'seller'],
       order: { created_at: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async confirmReceipt(transactionId: string, buyerId: string): Promise<void> {
@@ -129,7 +172,6 @@ export class TransactionsService {
     await this.usersService.incrementSalesCount(transaction.seller_id);
     await this.usersService.incrementPurchasesCount(transaction.buyer_id);
 
-    // Log history
     await this.logHistory(
       transactionId,
       buyerId,
@@ -153,25 +195,19 @@ export class TransactionsService {
       throw new ForbiddenException('You are not part of this transaction');
     }
 
-    if (
-      transaction.status !== TransactionStatus.PAID &&
-      transaction.status !== TransactionStatus.CONFIRMED
-    ) {
+    if (transaction.status !== TransactionStatus.PAID) {
       throw new BadRequestException('Cannot open dispute for this transaction');
     }
 
     const oldStatus = transaction.status;
 
-    // Update transaction
     transaction.status = TransactionStatus.DISPUTED;
     transaction.dispute_reason = openDisputeDto.reason;
     transaction.dispute_opened_at = new Date();
     await this.transactionRepository.save(transaction);
 
-    // Mark listing as disputed
     await this.listingsService.markAsDisputed(transaction.listing_id);
 
-    // Log history
     await this.logHistory(
       transactionId,
       userId,
@@ -183,14 +219,13 @@ export class TransactionsService {
 
   async updatePaymentStatus(
     transactionId: string,
-    txHash: string,
-    blockNumber: number,
+    dto: UpdatePaymentDto,
   ): Promise<void> {
     const transaction = await this.findOne(transactionId);
 
     transaction.status = TransactionStatus.PAID;
-    transaction.tx_hash = txHash;
-    transaction.block_number = blockNumber;
+    transaction.tx_hash = dto.txHash;
+    transaction.block_number = dto.blockNumber;
     transaction.paid_at = new Date();
 
     await this.transactionRepository.save(transaction);

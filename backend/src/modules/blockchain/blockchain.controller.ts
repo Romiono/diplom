@@ -6,11 +6,13 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { IsString, IsNumber, IsPositive } from 'class-validator';
 import { TonClientService } from './services/ton-client.service';
 import { EscrowService } from './services/escrow.service';
 import { Public } from '../../common/decorators/public.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 class DeployEscrowDto {
   @IsString()
@@ -29,6 +31,7 @@ class DeployEscrowDto {
 }
 
 @Controller('blockchain')
+@UseGuards(JwtAuthGuard)
 export class BlockchainController {
   constructor(
     private readonly tonClientService: TonClientService,
@@ -100,7 +103,6 @@ export class BlockchainController {
   /**
    * Деплой escrow контракта (для тестирования)
    */
-  @Public()
   @Post('escrow/deploy')
   async deployEscrow(@Body() dto: DeployEscrowDto) {
     try {
@@ -158,7 +160,6 @@ export class BlockchainController {
   /**
    * Fund escrow контракта (для тестирования)
    */
-  @Public()
   @Post('escrow/:address/fund')
   async fundEscrow(@Param('address') address: string) {
     try {
@@ -183,7 +184,6 @@ export class BlockchainController {
   /**
    * Release средств (для тестирования, обычно вызывается через transactions API)
    */
-  @Public()
   @Post('escrow/:address/release')
   async releaseEscrow(@Param('address') address: string) {
     try {
@@ -208,7 +208,6 @@ export class BlockchainController {
   /**
    * Refund средств (для тестирования)
    */
-  @Public()
   @Post('escrow/:address/refund')
   async refundEscrow(@Param('address') address: string) {
     try {

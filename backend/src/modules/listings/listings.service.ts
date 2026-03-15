@@ -169,10 +169,29 @@ export class ListingsService {
     });
   }
 
-  async reserveListing(id: string): Promise<void> {
-    await this.listingRepository.update(id, {
-      status: ListingStatus.RESERVED,
-    });
+  async reserveListing(id: string): Promise<boolean> {
+    const result = await this.listingRepository
+      .createQueryBuilder()
+      .update(Listing)
+      .set({ status: ListingStatus.RESERVED })
+      .where('id = :id AND status = :status', {
+        id,
+        status: ListingStatus.ACTIVE,
+      })
+      .execute();
+    return result.affected > 0;
+  }
+
+  async unreserveListing(id: string): Promise<void> {
+    await this.listingRepository
+      .createQueryBuilder()
+      .update(Listing)
+      .set({ status: ListingStatus.ACTIVE })
+      .where('id = :id AND status = :status', {
+        id,
+        status: ListingStatus.RESERVED,
+      })
+      .execute();
   }
 
   async markAsSold(id: string): Promise<void> {
