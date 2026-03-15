@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TonClient, Address } from '@ton/ton';
-import { getHttpEndpoint } from '@orbs-network/ton-access';
 
 @Injectable()
 export class TonClientService {
@@ -15,11 +14,12 @@ export class TonClientService {
 
   async getClient(): Promise<TonClient> {
     if (!this.client) {
-      const endpoint = await getHttpEndpoint({
-        network: this.isTestnet ? 'testnet' : 'mainnet',
-      });
+      const endpoint = this.isTestnet
+        ? 'https://testnet.toncenter.com/api/v2/jsonRPC'
+        : 'https://toncenter.com/api/v2/jsonRPC';
 
-      this.client = new TonClient({ endpoint });
+      const apiKey = this.configService.get<string>('ton.apiKey');
+      this.client = new TonClient({ endpoint, ...(apiKey ? { apiKey } : {}) });
       console.log(
         `TON client initialized for ${this.isTestnet ? 'testnet' : 'mainnet'}`,
       );

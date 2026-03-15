@@ -1,7 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TonClientService } from './ton-client.service';
-import { Address, toNano, Cell, WalletContractV4, internal } from '@ton/core';
+import { Address, toNano, Cell, internal } from '@ton/core';
+import { WalletContractV4 } from '@ton/ton';
 import { Escrow, EscrowStatus } from '../../../../contracts/wrappers/Escrow';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -18,6 +19,7 @@ export interface EscrowDeployParams {
 export class EscrowService implements OnModuleInit {
   private compiledCode: Cell | null = null;
   private adminWallet: WalletContractV4 | null = null;
+  private adminKeyPair: { publicKey: Buffer; secretKey: Buffer } | null = null;
 
   constructor(
     private configService: ConfigService,
@@ -43,8 +45,8 @@ export class EscrowService implements OnModuleInit {
 
   private async loadCompiledContract(): Promise<void> {
     const compiledPath = path.join(
-      __dirname,
-      '../../../../contracts/build/escrow.compiled.json',
+      process.cwd(),
+      'contracts/build/escrow.compiled.json',
     );
 
     if (fs.existsSync(compiledPath)) {
@@ -59,7 +61,7 @@ export class EscrowService implements OnModuleInit {
 
   private async initializeAdminWallet(mnemonic: string): Promise<void> {
     const keyPair = await mnemonicToPrivateKey(mnemonic.split(' '));
-    const client = await this.tonClientService.getClient();
+    this.adminKeyPair = keyPair;
 
     this.adminWallet = WalletContractV4.create({
       workchain: 0,
@@ -127,7 +129,8 @@ export class EscrowService implements OnModuleInit {
       }
 
       // Отправляем транзакцию деплоя
-      const sender = client.sender(this.adminWallet.address);
+      const openedWallet = client.open(this.adminWallet);
+      const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await contract.sendDeploy(sender, deployFee);
 
       console.log('Escrow deployed successfully:', escrow.address.toString());
@@ -138,6 +141,42 @@ export class EscrowService implements OnModuleInit {
       return escrow.address.toString();
     } catch (error) {
       console.error('Failed to deploy escrow:', error);
+      throw error;
+    }
+  }
+
+  async fund(contractAddress: string): Promise<void> {
+    if (!this.adminWallet) {
+      throw new Error('Admin wallet not initialized');
+    }
+
+    try {
+      const address = Address.parse(contractAddress);
+      const client = await this.tonClientService.getClient();
+      const escrow = client.open(new Escrow(address));
+
+      console.log('Funding escrow contract:', contractAddress);
+
+      // Проверяем статус контракта
+      const status = await escrow.getStatus();
+      if (status !== EscrowStatus.CREATED) {
+        throw new Error(
+          `Cannot fund: contract is not in CREATED status (current: ${status})`,
+        );
+      }
+
+      // Получаем amount из контракта
+      const data = await escrow.getContractData();
+      const fundAmount = data.amount + toNano('0.05'); // amount + gas
+
+      // Отправляем транзакцию fund (admin выступает как buyer)
+      const openedWallet = client.open(this.adminWallet);
+      const sender = openedWallet.sender(this.adminKeyPair.secretKey);
+      await escrow.sendFund(sender, fundAmount);
+
+      console.log('Fund transaction sent successfully');
+    } catch (error) {
+      console.error('Failed to fund escrow:', error);
       throw error;
     }
   }
@@ -163,7 +202,8 @@ export class EscrowService implements OnModuleInit {
       }
 
       // Отправляем транзакцию release
-      const sender = client.sender(this.adminWallet.address);
+      const openedWallet = client.open(this.adminWallet);
+      const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await escrow.sendRelease(sender);
 
       console.log('Release transaction sent successfully');
@@ -194,7 +234,8 @@ export class EscrowService implements OnModuleInit {
       }
 
       // Отправляем транзакцию refund
-      const sender = client.sender(this.adminWallet.address);
+      const openedWallet = client.open(this.adminWallet);
+      const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await escrow.sendRefund(sender);
 
       console.log('Refund transaction sent successfully');

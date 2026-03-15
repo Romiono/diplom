@@ -7,14 +7,24 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { IsString, IsNumber, IsPositive } from 'class-validator';
 import { TonClientService } from './services/ton-client.service';
 import { EscrowService } from './services/escrow.service';
 import { Public } from '../../common/decorators/public.decorator';
 
 class DeployEscrowDto {
+  @IsString()
   sellerAddress: string;
+
+  @IsString()
   buyerAddress: string;
+
+  @IsNumber()
+  @IsPositive()
   amount: number;
+
+  @IsNumber()
+  @IsPositive()
   timeoutSeconds: number;
 }
 
@@ -141,6 +151,31 @@ export class BlockchainController {
           message: error.message,
         },
         HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  /**
+   * Fund escrow контракта (для тестирования)
+   */
+  @Public()
+  @Post('escrow/:address/fund')
+  async fundEscrow(@Param('address') address: string) {
+    try {
+      await this.escrowService.fund(address);
+      return {
+        success: true,
+        message: 'Fund transaction sent',
+        contractAddress: address,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          error: 'Failed to fund escrow',
+          message: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
