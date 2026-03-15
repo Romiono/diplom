@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { TonAuthDto } from './dto/ton-auth.dto';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
+import { signVerify } from '@ton/crypto';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -16,12 +17,30 @@ export class AuthService {
   ) {}
 
   async authenticateWithTon(tonAuthDto: TonAuthDto) {
-    const { walletAddress, signature, payload } = tonAuthDto;
+    const { walletAddress, publicKey, signature, payload } = tonAuthDto;
 
-    // Verify signature (simplified for MVP)
-    // In production, use proper TON signature verification with tonweb or @ton/crypto
-    const isValidSignature = await this.verifyTonSignature(
+    // 1. Find user — must exist (nonce was pre-generated via /auth/nonce)
+    const user = await this.userRepository.findOne({
+      where: { wallet_address: walletAddress },
+    });
+
+    if (!user || !user.auth_nonce) {
+      throw new UnauthorizedException(
+        'No active nonce found. Please request a nonce first via GET /auth/nonce',
+      );
+    }
+
+    // 2. Verify nonce: payload must match stored nonce exactly
+    if (user.auth_nonce !== payload) {
+      throw new UnauthorizedException(
+        'Nonce mismatch. Please request a new nonce.',
+      );
+    }
+
+    // 3. Verify Ed25519 signature over the signed message
+    const isValidSignature = this.verifyTonSignature(
       walletAddress,
+      publicKey,
       signature,
       payload,
     );
@@ -30,20 +49,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid signature');
     }
 
-    // Find or create user
-    let user = await this.userRepository.findOne({
-      where: { wallet_address: walletAddress },
-    });
+    // 4. Invalidate nonce immediately (single-use)
+    user.auth_nonce = null;
+    await this.userRepository.save(user);
 
-    if (!user) {
-      user = this.userRepository.create({
-        wallet_address: walletAddress,
-        display_name: `User ${walletAddress.slice(0, 6)}`,
-      });
-      await this.userRepository.save(user);
-    }
-
-    // Generate JWT token
+    // 5. Issue JWT
     const jwtPayload: JwtPayloadDto = {
       sub: user.id,
       walletAddress: user.wallet_address,
@@ -64,37 +74,26 @@ export class AuthService {
     };
   }
 
-  private async verifyTonSignature(
+  private verifyTonSignature(
     walletAddress: string,
+    publicKey: string,
     signature: string,
-    payload: string,
-  ): Promise<boolean> {
-    // MVP: Basic verification
-    // TODO: Implement proper TON signature verification
-    // This should verify that the signature was created by the private key
-    // corresponding to the walletAddress using TON crypto libraries
-
-    // For now, we'll do a simple check
-    // In production, use: TonConnect SDK verification or @ton/crypto
-
+    nonce: string,
+  ): boolean {
     try {
-      // Placeholder verification
-      // Real implementation would:
-      // 1. Parse the signature
-      // 2. Recover the public key from signature
-      // 3. Verify it matches the wallet address
-      // 4. Verify the payload was signed
+      // Signed message: "ton-auth:<walletAddress>:<nonce>"
+      // This format binds the signature to a specific address and nonce,
+      // preventing cross-address and replay attacks.
+      const message = Buffer.from(`ton-auth:${walletAddress}:${nonce}`);
+      const signatureBytes = Buffer.from(signature, 'base64');
+      const publicKeyBytes = Buffer.from(publicKey, 'hex');
 
-      // For MVP, we'll accept if all fields are present and non-empty
-      return (
-        walletAddress &&
-        signature &&
-        payload &&
-        walletAddress.length > 0 &&
-        signature.length > 0 &&
-        payload.length > 0
-      );
-    } catch (error) {
+      if (signatureBytes.length !== 64 || publicKeyBytes.length !== 32) {
+        return false;
+      }
+
+      return signVerify(message, signatureBytes, publicKeyBytes);
+    } catch {
       return false;
     }
   }
@@ -102,15 +101,21 @@ export class AuthService {
   async generateNonce(walletAddress: string): Promise<string> {
     const nonce = crypto.randomBytes(32).toString('hex');
 
-    // Save nonce to user or cache
-    const user = await this.userRepository.findOne({
+    // Upsert: create user record if not exists, then save nonce.
+    // This ensures nonce is always persisted for both new and existing users.
+    let user = await this.userRepository.findOne({
       where: { wallet_address: walletAddress },
     });
 
-    if (user) {
-      user.auth_nonce = nonce;
-      await this.userRepository.save(user);
+    if (!user) {
+      user = this.userRepository.create({
+        wallet_address: walletAddress,
+        display_name: `User ${walletAddress.slice(0, 6)}`,
+      });
     }
+
+    user.auth_nonce = nonce;
+    await this.userRepository.save(user);
 
     return nonce;
   }

@@ -1,8 +1,12 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { TonAuthDto } from './dto/ton-auth.dto';
 import { Public } from '../../common/decorators/public.decorator';
 
+// Auth endpoints are rate-limited to 5 requests per 15 minutes
+// to protect against brute-force and enumeration attacks.
+@Throttle({ default: { limit: 5, ttl: 900000 } })
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
