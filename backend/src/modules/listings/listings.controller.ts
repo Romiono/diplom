@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ListingsService } from './listings.service';
 import { CreateListingDto } from './dto/create-listing.dto';
@@ -30,7 +31,7 @@ export class ListingsController {
 
   @Public()
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.listingsService.findOne(id);
   }
 
@@ -46,7 +47,7 @@ export class ListingsController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateListingDto: UpdateListingDto,
     @CurrentUser() user: JwtPayload,
   ) {
@@ -55,12 +56,28 @@ export class ListingsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
     return this.listingsService.remove(id, user.sub);
   }
 
   @Get('user/:userId')
-  async getUserListings(@Param('userId') userId: string) {
-    return this.listingsService.getUserListings(userId);
+  @UseGuards(JwtAuthGuard)
+  async getUserListings(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @CurrentUser() user: JwtPayload,
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+  ) {
+    const pageNum = Math.max(1, Number(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, Number(limit) || 20));
+    return this.listingsService.getUserListings(
+      userId,
+      user.sub,
+      pageNum,
+      limitNum,
+    );
   }
 }

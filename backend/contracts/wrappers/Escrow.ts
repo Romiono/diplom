@@ -47,7 +47,6 @@ export class Escrow implements Contract {
     return new Escrow(address, init);
   }
 
-  // Send internal message to contract
   async sendDeploy(provider: ContractProvider, via: Sender, value: bigint) {
     await provider.internal(via, {
       value,
@@ -56,7 +55,6 @@ export class Escrow implements Contract {
     });
   }
 
-  // OP 1: Fund escrow (buyer sends payment)
   async sendFund(provider: ContractProvider, via: Sender, value: bigint) {
     await provider.internal(via, {
       value,

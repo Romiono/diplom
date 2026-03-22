@@ -4,11 +4,15 @@ import {
   IsNumber,
   IsEnum,
   IsInt,
+  IsIn,
   Min,
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ListingCondition } from '../entities/listing.entity';
+
+const ALLOWED_SORT_FIELDS = ['created_at', 'price', 'views_count'] as const;
+const ALLOWED_SORT_ORDERS = ['ASC', 'DESC'] as const;
 
 export class SearchListingDto {
   @IsOptional()
@@ -41,12 +45,12 @@ export class SearchListingDto {
   location?: string;
 
   @IsOptional()
-  @IsString()
-  sortBy?: 'created_at' | 'price' | 'views_count';
+  @IsIn(ALLOWED_SORT_FIELDS, { message: 'sortBy must be one of: created_at, price, views_count' })
+  sortBy?: (typeof ALLOWED_SORT_FIELDS)[number];
 
   @IsOptional()
-  @IsString()
-  sortOrder?: 'ASC' | 'DESC';
+  @IsIn(ALLOWED_SORT_ORDERS, { message: 'sortOrder must be ASC or DESC' })
+  sortOrder?: (typeof ALLOWED_SORT_ORDERS)[number];
 
   @IsOptional()
   @IsInt()

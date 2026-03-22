@@ -8,6 +8,7 @@ import { Listing } from '../listings/entities/listing.entity';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { ListingsModule } from '../listings/listings.module';
 import { UsersModule } from '../users/users.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UsersModule } from '../users/users.module';
     BlockchainModule,
     ListingsModule,
     UsersModule,
+    NotificationsModule,
   ],
   controllers: [TransactionsController],
   providers: [TransactionsService],

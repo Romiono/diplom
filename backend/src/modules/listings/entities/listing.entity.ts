@@ -51,7 +51,13 @@ export class Listing {
   @Column({ type: 'text', nullable: false })
   description: string;
 
-  @Column({ type: 'decimal', precision: 15, scale: 2, nullable: false })
+  @Column({
+    type: 'decimal',
+    precision: 15,
+    scale: 2,
+    nullable: false,
+    transformer: { to: (v: number) => v, from: (v: string) => parseFloat(v) },
+  })
   price: number;
 
   @Column({ type: 'varchar', length: 10, default: 'TON' })
@@ -89,7 +95,6 @@ export class Listing {
   @Column({ type: 'timestamp', nullable: true })
   sold_at: Date;
 
-  // Relations
   @ManyToOne(() => User, (user) => user.listings, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'seller_id' })
   seller: User;

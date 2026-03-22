@@ -20,18 +20,15 @@ async function testBlockchain() {
   const tonClientService = app.get(TonClientService);
 
   try {
-    // 1. Проверка подключения к TON
     console.log('1️⃣ Testing TON connection...');
     const client = await tonClientService.getClient();
     console.log('✅ Connected to TON network\n');
 
-    // 2. Проверка валидации адресов
     console.log('2️⃣ Testing address validation...');
     const testAddress = 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
     const isValid = await tonClientService.isValidAddress(testAddress);
     console.log(`Test address ${testAddress}: ${isValid ? '✅ Valid' : '❌ Invalid'}\n`);
 
-    // 3. Тестовые адреса (замените на реальные для тестирования)
     const SELLER_ADDRESS = process.env.TEST_SELLER_ADDRESS || 'EQD4FPq-PRDieyQKkizFTRtSDyucUIqrj0v_zXJmqaDp6_0t';
     const BUYER_ADDRESS = process.env.TEST_BUYER_ADDRESS || 'EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N';
 
@@ -41,7 +38,6 @@ async function testBlockchain() {
     console.log('Amount: 1 TON');
     console.log('Timeout: 30 days\n');
 
-    // 4. Деплой контракта (закомментировано для безопасности)
     console.log('⚠️  Contract deployment is commented out for safety');
     console.log('To deploy, uncomment the code below and ensure you have:');
     console.log('- Compiled contract (npm run contract:compile)');
@@ -78,7 +74,6 @@ async function testBlockchain() {
   }
 }
 
-// Run tests
 testBlockchain().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);

@@ -13,6 +13,7 @@ import { TonClientService } from './services/ton-client.service';
 import { EscrowService } from './services/escrow.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { AdminGuard } from '../../common/guards/admin.guard';
 
 class DeployEscrowDto {
   @IsString()
@@ -104,6 +105,7 @@ export class BlockchainController {
    * Деплой escrow контракта (для тестирования)
    */
   @Post('escrow/deploy')
+  @UseGuards(AdminGuard)
   async deployEscrow(@Body() dto: DeployEscrowDto) {
     try {
       const contractAddress = await this.escrowService.deployEscrow({
@@ -161,6 +163,7 @@ export class BlockchainController {
    * Fund escrow контракта (для тестирования)
    */
   @Post('escrow/:address/fund')
+  @UseGuards(AdminGuard)
   async fundEscrow(@Param('address') address: string) {
     try {
       await this.escrowService.fund(address);
@@ -185,6 +188,7 @@ export class BlockchainController {
    * Release средств (для тестирования, обычно вызывается через transactions API)
    */
   @Post('escrow/:address/release')
+  @UseGuards(AdminGuard)
   async releaseEscrow(@Param('address') address: string) {
     try {
       await this.escrowService.release(address);
@@ -209,6 +213,7 @@ export class BlockchainController {
    * Refund средств (для тестирования)
    */
   @Post('escrow/:address/refund')
+  @UseGuards(AdminGuard)
   async refundEscrow(@Param('address') address: string) {
     try {
       await this.escrowService.refund(address);

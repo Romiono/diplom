@@ -34,7 +34,6 @@ export class TransactionHistory {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => Transaction, (transaction) => transaction.history)
   @JoinColumn({ name: 'transaction_id' })
   transaction: Transaction;

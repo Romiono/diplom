@@ -36,7 +36,6 @@ export class ListingImage {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => Listing, (listing) => listing.images, {
     onDelete: 'CASCADE',
   })

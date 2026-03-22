@@ -44,7 +44,6 @@ export class Transaction {
   @Column({ type: 'decimal', precision: 15, scale: 2, nullable: false })
   amount: number;
 
-  // Blockchain data
   @Column({ type: 'varchar', length: 48, nullable: true })
   escrow_contract_address: string;
 
@@ -54,7 +53,6 @@ export class Transaction {
   @Column({ type: 'bigint', nullable: true })
   block_number: number;
 
-  // Status and timestamps
   @Column({
     type: 'varchar',
     length: 20,
@@ -74,7 +72,6 @@ export class Transaction {
   @Column({ type: 'timestamp', nullable: true })
   completed_at: Date;
 
-  // Dispute handling
   @Column({ type: 'text', nullable: true })
   dispute_reason: string;
 
@@ -90,7 +87,6 @@ export class Transaction {
   @Column({ type: 'timestamp', nullable: true })
   dispute_resolved_at: Date;
 
-  // Relations
   @ManyToOne(() => Listing, (listing) => listing.transactions)
   @JoinColumn({ name: 'listing_id' })
   listing: Listing;

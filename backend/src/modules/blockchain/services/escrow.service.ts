@@ -28,18 +28,14 @@ export class EscrowService implements OnModuleInit {
 
   async onModuleInit() {
     try {
-      // Загружаем скомпилированный контракт
       await this.loadCompiledContract();
 
-      // Инициализируем админ wallet если есть mnemonic
       const mnemonic = this.configService.get<string>('ton.adminWalletMnemonic');
       if (mnemonic && mnemonic.length > 0) {
         await this.initializeAdminWallet(mnemonic);
       }
     } catch (error) {
       console.error('Failed to initialize EscrowService:', error);
-      // В production режиме это критическая ошибка
-      // В dev режиме продолжаем работу без реального контракта
     }
   }
 
@@ -74,14 +70,12 @@ export class EscrowService implements OnModuleInit {
   async deployEscrow(params: EscrowDeployParams): Promise<string> {
     const { sellerAddress, buyerAddress, amount, timeoutSeconds } = params;
 
-    // Проверяем наличие скомпилированного кода
     if (!this.compiledCode) {
       throw new Error(
         'Contract code not loaded. Run: npm run contract:compile',
       );
     }
 
-    // Проверяем наличие админ wallet
     if (!this.adminWallet) {
       throw new Error(
         'Admin wallet not initialized. Set TON_ADMIN_WALLET_MNEMONIC in .env',
@@ -93,12 +87,11 @@ export class EscrowService implements OnModuleInit {
       const buyer = Address.parse(buyerAddress);
       const timeout = Math.floor(Date.now() / 1000) + timeoutSeconds;
 
-      // Создаем экземпляр контракта
       const escrow = Escrow.createFromConfig(
         {
           sellerAddress: seller,
           buyerAddress: buyer,
-          amount: BigInt(Math.floor(amount * 1e9)), // Convert to nanotons
+          amount: BigInt(Math.floor(amount * 1e9)),
           timeout,
           adminAddress: this.adminWallet.address,
         },
@@ -116,7 +109,6 @@ export class EscrowService implements OnModuleInit {
         timeout: new Date(timeout * 1000),
       });
 
-      // Проверяем баланс admin wallet
       const adminBalance = await this.tonClientService.getBalance(
         this.adminWallet.address.toString(),
       );
@@ -128,14 +120,12 @@ export class EscrowService implements OnModuleInit {
         );
       }
 
-      // Отправляем транзакцию деплоя
       const openedWallet = client.open(this.adminWallet);
       const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await contract.sendDeploy(sender, deployFee);
 
       console.log('Escrow deployed successfully:', escrow.address.toString());
 
-      // Ждем подтверждения (в реальности нужно опрашивать блокчейн)
       await this.waitForDeployment(escrow.address.toString(), 30000);
 
       return escrow.address.toString();
@@ -157,7 +147,6 @@ export class EscrowService implements OnModuleInit {
 
       console.log('Funding escrow contract:', contractAddress);
 
-      // Проверяем статус контракта
       const status = await escrow.getStatus();
       if (status !== EscrowStatus.CREATED) {
         throw new Error(
@@ -165,11 +154,9 @@ export class EscrowService implements OnModuleInit {
         );
       }
 
-      // Получаем amount из контракта
       const data = await escrow.getContractData();
-      const fundAmount = data.amount + toNano('0.05'); // amount + gas
+      const fundAmount = data.amount + toNano('0.05');
 
-      // Отправляем транзакцию fund (admin выступает как buyer)
       const openedWallet = client.open(this.adminWallet);
       const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await escrow.sendFund(sender, fundAmount);
@@ -193,7 +180,6 @@ export class EscrowService implements OnModuleInit {
 
       console.log('Releasing funds from escrow:', contractAddress);
 
-      // Проверяем статус контракта
       const status = await escrow.getStatus();
       if (status !== EscrowStatus.FUNDED) {
         throw new Error(
@@ -201,7 +187,6 @@ export class EscrowService implements OnModuleInit {
         );
       }
 
-      // Отправляем транзакцию release
       const openedWallet = client.open(this.adminWallet);
       const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await escrow.sendRelease(sender);
@@ -225,7 +210,6 @@ export class EscrowService implements OnModuleInit {
 
       console.log('Refunding funds to buyer:', contractAddress);
 
-      // Проверяем статус контракта
       const status = await escrow.getStatus();
       if (status !== EscrowStatus.FUNDED) {
         throw new Error(
@@ -233,7 +217,6 @@ export class EscrowService implements OnModuleInit {
         );
       }
 
-      // Отправляем транзакцию refund
       const openedWallet = client.open(this.adminWallet);
       const sender = openedWallet.sender(this.adminKeyPair.secretKey);
       await escrow.sendRefund(sender);
@@ -251,14 +234,13 @@ export class EscrowService implements OnModuleInit {
       const client = await this.tonClientService.getClient();
       const escrow = client.open(new Escrow(address));
 
-      // Получаем данные контракта
       const data = await escrow.getContractData();
 
       return {
         address: contractAddress,
         seller: data.seller.toString(),
         buyer: data.buyer.toString(),
-        amount: Number(data.amount) / 1e9, // Convert from nanotons
+        amount: Number(data.amount) / 1e9,
         timeout: new Date(data.timeout * 1000),
         status: this.getStatusName(data.status),
         admin: data.admin.toString(),
@@ -280,7 +262,7 @@ export class EscrowService implements OnModuleInit {
     timeout: number = 30000,
   ): Promise<void> {
     const startTime = Date.now();
-    const pollInterval = 2000; // 2 seconds
+    const pollInterval = 2000;
 
     while (Date.now() - startTime < timeout) {
       try {
@@ -290,7 +272,6 @@ export class EscrowService implements OnModuleInit {
           return;
         }
       } catch (error) {
-        // Contract not yet deployed, continue polling
       }
 
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
