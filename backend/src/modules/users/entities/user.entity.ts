@@ -49,7 +49,7 @@ export class User {
   @Column({ type: 'boolean', default: false })
   is_admin: boolean;
 
-  @Column({ type: 'varchar', length: 64, nullable: true })
+  @Column({ type: 'varchar', length: 64, nullable: true, select: false })
   auth_nonce: string;
 
   @CreateDateColumn()
@@ -58,7 +58,6 @@ export class User {
   @UpdateDateColumn()
   updated_at: Date;
 
-  // Relations
   @OneToMany(() => Listing, (listing) => listing.seller)
   listings: Listing[];
 

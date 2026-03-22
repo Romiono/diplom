@@ -1,14 +1,22 @@
-import { IsString, IsEmail, IsOptional, MaxLength } from 'class-validator';
+import { IsString, IsEmail, IsOptional, MaxLength, IsUrl, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+const sanitizeHtml: (dirty: string, options?: object) => string = require('sanitize-html');
+
+const stripHtml = ({ value }: { value: unknown }) =>
+  typeof value === 'string' ? sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }) : value;
 
 export class UpdateUserDto {
   @IsOptional()
   @IsString()
+  @MinLength(3)
   @MaxLength(50)
+  @Transform(stripHtml)
   username?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(100)
+  @Transform(stripHtml)
   display_name?: string;
 
   @IsOptional()
@@ -16,12 +24,6 @@ export class UpdateUserDto {
   email?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(500)
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
   avatar_url?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(200)
-  location?: string;
 }

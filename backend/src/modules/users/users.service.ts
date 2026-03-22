@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -36,7 +37,6 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
-    // Check username uniqueness if provided
     if (updateUserDto.username && updateUserDto.username !== user.username) {
       const existingUser = await this.userRepository.findOne({
         where: { username: updateUserDto.username },
@@ -47,7 +47,6 @@ export class UsersService {
       }
     }
 
-    // Check email uniqueness if provided
     if (updateUserDto.email && updateUserDto.email !== user.email) {
       const existingUser = await this.userRepository.findOne({
         where: { email: updateUserDto.email },
@@ -59,10 +58,40 @@ export class UsersService {
     }
 
     Object.assign(user, updateUserDto);
-    return this.userRepository.save(user);
+    try {
+      return await this.userRepository.save(user);
+    } catch (err) {
+      if (err?.code === '23505') {
+        throw new ConflictException('Username or email already in use');
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   async getProfile(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: [
+        'id',
+        'wallet_address',
+        'username',
+        'display_name',
+        'avatar_url',
+        'rating',
+        'total_sales',
+        'total_purchases',
+        'created_at',
+      ],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async getOwnProfile(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
       select: [
@@ -87,7 +116,6 @@ export class UsersService {
   }
 
   async updateRating(userId: string): Promise<void> {
-    // Calculate average rating from reviews
     const result = await this.userRepository
       .createQueryBuilder('user')
       .leftJoin('user.reviews_received', 'review')

@@ -6,6 +6,7 @@ import {
   Body,
   UseGuards,
   ForbiddenException,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,17 +20,22 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  async getProfile(@Param('id') id: string) {
+  async getProfile(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    if (user.sub === id || user.isAdmin) {
+      return this.usersService.getOwnProfile(id);
+    }
     return this.usersService.getProfile(id);
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    // Users can only update their own profile
     if (user.sub !== id && !user.isAdmin) {
       throw new ForbiddenException('You can only update your own profile');
     }
@@ -38,7 +44,7 @@ export class UsersController {
   }
 
   @Get(':id/stats')
-  async getUserStats(@Param('id') id: string) {
+  async getUserStats(@Param('id', ParseUUIDPipe) id: string) {
     const user = await this.usersService.findOne(id);
     return {
       rating: user.rating,
