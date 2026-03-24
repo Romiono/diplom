@@ -4,25 +4,85 @@ import {
   MessageBody,
   WebSocketServer,
   ConnectedSocket,
+  OnGatewayConnection,
+  WsException,
 } from '@nestjs/websockets';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { JoinChatDto } from './dto/join-chat.dto';
+import { TypingDto } from './dto/typing.dto';
+import { User } from '../users/entities/user.entity';
+import { JwtPayload } from '../../common/interfaces/request-with-user.interface';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
+      const allowed = process.env.FRONTEND_URL || 'http://localhost:3001';
+      if (!origin || origin === allowed) {
+        callback(null, true);
+      } else {
+        callback(new Error('WebSocket connection not allowed by CORS'), false);
+      }
+    },
+    credentials: true,
   },
 })
-export class MessagesGateway {
+@UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+export class MessagesGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(
+    private readonly messagesService: MessagesService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async handleConnection(client: Socket) {
+    try {
+      const raw =
+        (client.handshake.auth?.token as string) ||
+        (client.handshake.headers?.authorization as string)?.replace(
+          'Bearer ',
+          '',
+        );
+
+      if (!raw) {
+        client.disconnect(true);
+        return;
+      }
+
+      const payload = this.jwtService.verify<JwtPayload>(raw, {
+        secret: this.configService.get<string>('security.jwt.secret'),
+      });
+
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub },
+        select: ['id', 'is_active'],
+      });
+
+      if (!user || !user.is_active) {
+        client.disconnect(true);
+        return;
+      }
+
+      client.data.user = payload;
+    } catch {
+      client.disconnect(true);
+    }
+  }
 
   @SubscribeMessage('chat:join')
   handleJoinChat(
-    @MessageBody() data: { listingId: string; userId: string },
+    @MessageBody() data: JoinChatDto,
     @ConnectedSocket() client: Socket,
   ) {
     const room = `listing:${data.listingId}`;
@@ -32,28 +92,30 @@ export class MessagesGateway {
 
   @SubscribeMessage('message:send')
   async handleMessage(
-    @MessageBody() data: CreateMessageDto & { senderId: string },
+    @MessageBody() data: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const message = await this.messagesService.create(data.senderId, {
-      listing_id: data.listing_id,
-      receiver_id: data.receiver_id,
-      content: data.content,
-    });
+    const senderId = (client.data.user as JwtPayload).sub;
 
-    // Broadcast to room
-    const room = `listing:${data.listing_id}`;
-    this.server.to(room).emit('message:new', message);
-
-    return { event: 'message:sent', data: message };
+    try {
+      const message = await this.messagesService.create(senderId, data);
+      const room = `listing:${data.listing_id}`;
+      this.server.to(room).emit('message:new', message);
+      return { event: 'message:sent', data: message };
+    } catch (error) {
+      throw new WsException(
+        (error as Error).message || 'Failed to send message',
+      );
+    }
   }
 
   @SubscribeMessage('message:typing')
   handleTyping(
-    @MessageBody() data: { listingId: string; userId: string },
+    @MessageBody() data: TypingDto,
     @ConnectedSocket() client: Socket,
   ) {
+    const userId = (client.data.user as JwtPayload).sub;
     const room = `listing:${data.listingId}`;
-    client.to(room).emit('message:typing', { userId: data.userId });
+    client.to(room).emit('message:typing', { userId });
   }
 }

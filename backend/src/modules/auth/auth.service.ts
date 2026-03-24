@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,10 +19,11 @@ export class AuthService {
   async authenticateWithTon(tonAuthDto: TonAuthDto) {
     const { walletAddress, publicKey, signature, payload } = tonAuthDto;
 
-    // 1. Find user — must exist (nonce was pre-generated via /auth/nonce)
-    const user = await this.userRepository.findOne({
-      where: { wallet_address: walletAddress },
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.auth_nonce')
+      .where('user.wallet_address = :walletAddress', { walletAddress })
+      .getOne();
 
     if (!user || !user.auth_nonce) {
       throw new UnauthorizedException(
@@ -30,14 +31,12 @@ export class AuthService {
       );
     }
 
-    // 2. Verify nonce: payload must match stored nonce exactly
     if (user.auth_nonce !== payload) {
       throw new UnauthorizedException(
         'Nonce mismatch. Please request a new nonce.',
       );
     }
 
-    // 3. Verify Ed25519 signature over the signed message
     const isValidSignature = this.verifyTonSignature(
       walletAddress,
       publicKey,
@@ -49,11 +48,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid signature');
     }
 
-    // 4. Invalidate nonce immediately (single-use)
     user.auth_nonce = null;
     await this.userRepository.save(user);
 
-    // 5. Issue JWT
     const jwtPayload: JwtPayloadDto = {
       sub: user.id,
       walletAddress: user.wallet_address,
@@ -81,9 +78,6 @@ export class AuthService {
     nonce: string,
   ): boolean {
     try {
-      // Signed message: "ton-auth:<walletAddress>:<nonce>"
-      // This format binds the signature to a specific address and nonce,
-      // preventing cross-address and replay attacks.
       const message = Buffer.from(`ton-auth:${walletAddress}:${nonce}`);
       const signatureBytes = Buffer.from(signature, 'base64');
       const publicKeyBytes = Buffer.from(publicKey, 'hex');
@@ -99,10 +93,13 @@ export class AuthService {
   }
 
   async generateNonce(walletAddress: string): Promise<string> {
+    const TON_ADDRESS_RE = /^[0-9A-Za-z_+-]{48}$|^-?[0-9]:[0-9a-fA-F]{64}$/;
+    if (!TON_ADDRESS_RE.test(walletAddress)) {
+      throw new BadRequestException('Invalid TON wallet address format');
+    }
+
     const nonce = crypto.randomBytes(32).toString('hex');
 
-    // Upsert: create user record if not exists, then save nonce.
-    // This ensures nonce is always persisted for both new and existing users.
     let user = await this.userRepository.findOne({
       where: { wallet_address: walletAddress },
     });

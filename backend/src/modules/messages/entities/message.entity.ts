@@ -35,7 +35,6 @@ export class Message {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => Listing, (listing) => listing.messages)
   @JoinColumn({ name: 'listing_id' })
   listing: Listing;
