@@ -5,9 +5,11 @@ import {
   Body,
   Param,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ResolveDisputeDto } from './dto/resolve-dispute.dto';
+import { BanUserDto } from './dto/ban-user.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtPayload } from '../../common/interfaces/request-with-user.interface';
 import { AdminGuard } from '../../common/guards/admin.guard';
@@ -25,7 +27,7 @@ export class AdminController {
 
   @Post('disputes/:id/resolve')
   async resolveDispute(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() resolveDisputeDto: ResolveDisputeDto,
     @CurrentUser() user: JwtPayload,
   ) {
@@ -35,11 +37,20 @@ export class AdminController {
 
   @Post('users/:id/ban')
   async banUser(
-    @Param('id') id: string,
-    @Body('reason') reason: string,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() banUserDto: BanUserDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    await this.adminService.banUser(user.sub, id, reason);
+    await this.adminService.banUser(user.sub, id, banUserDto.reason);
     return { message: 'User banned successfully' };
+  }
+
+  @Post('users/:id/unban')
+  async unbanUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    await this.adminService.unbanUser(user.sub, id);
+    return { message: 'User unbanned successfully' };
   }
 }

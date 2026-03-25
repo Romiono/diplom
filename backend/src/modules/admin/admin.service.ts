@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction, TransactionStatus } from '../transactions/entities/transaction.entity';
@@ -6,6 +11,7 @@ import { AdminAction, AdminActionType } from './entities/admin-action.entity';
 import { ResolveDisputeDto, DisputeResolution } from './dto/resolve-dispute.dto';
 import { EscrowService } from '../blockchain/services/escrow.service';
 import { User } from '../users/entities/user.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class AdminService {
@@ -17,14 +23,31 @@ export class AdminService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private escrowService: EscrowService,
+    private notificationsService: NotificationsService,
   ) {}
 
+  private readonly PUBLIC_USER_FIELDS = [
+    'id',
+    'wallet_address',
+    'username',
+    'display_name',
+    'avatar_url',
+    'rating',
+    'total_sales',
+    'created_at',
+  ];
+
   async getDisputes(): Promise<Transaction[]> {
-    return this.transactionRepository.find({
-      where: { status: TransactionStatus.DISPUTED },
-      relations: ['buyer', 'seller', 'listing'],
-      order: { dispute_opened_at: 'DESC' },
-    });
+    return this.transactionRepository
+      .createQueryBuilder('tx')
+      .leftJoin('tx.buyer', 'buyer')
+      .addSelect(this.PUBLIC_USER_FIELDS.map((f) => `buyer.${f}`))
+      .leftJoin('tx.seller', 'seller')
+      .addSelect(this.PUBLIC_USER_FIELDS.map((f) => `seller.${f}`))
+      .leftJoinAndSelect('tx.listing', 'listing')
+      .where('tx.status = :status', { status: TransactionStatus.DISPUTED })
+      .orderBy('tx.dispute_opened_at', 'DESC')
+      .getMany();
   }
 
   async resolveDispute(
@@ -42,27 +65,43 @@ export class AdminService {
     }
 
     if (transaction.status !== TransactionStatus.DISPUTED) {
-      throw new NotFoundException('Transaction is not in disputed status');
+      throw new BadRequestException('Transaction is not in disputed status');
+    }
+
+    if (!transaction.escrow_contract_address) {
+      throw new BadRequestException(
+        'Transaction has no escrow contract address and cannot be resolved on-chain',
+      );
     }
 
     const { resolution, comment } = resolveDisputeDto;
 
-    // Execute resolution via smart contract
-    if (resolution === DisputeResolution.REFUND_BUYER) {
-      await this.escrowService.refund(transaction.escrow_contract_address);
-      transaction.status = TransactionStatus.REFUNDED;
-    } else {
-      await this.escrowService.release(transaction.escrow_contract_address);
-      transaction.status = TransactionStatus.COMPLETED;
-    }
-
+    transaction.status =
+      resolution === DisputeResolution.REFUND_BUYER
+        ? TransactionStatus.REFUNDED
+        : TransactionStatus.COMPLETED;
     transaction.dispute_resolved_by = adminId;
     transaction.dispute_resolution = comment;
     transaction.dispute_resolved_at = new Date();
 
     await this.transactionRepository.save(transaction);
 
-    // Log admin action
+    if (resolution === DisputeResolution.REFUND_BUYER) {
+      await this.escrowService.refund(transaction.escrow_contract_address);
+    } else {
+      await this.escrowService.release(transaction.escrow_contract_address);
+    }
+
+    if (resolution === DisputeResolution.REFUND_BUYER) {
+      this.notificationsService
+        .sendTransactionRefundedEmail(transaction)
+        .catch(() => {});
+    } else {
+      this.notificationsService
+        .sendTransactionCompletedEmail(transaction)
+        .catch(() => {});
+    }
+
     await this.logAdminAction(
       adminId,
       AdminActionType.RESOLVE_DISPUTE,
@@ -73,10 +112,18 @@ export class AdminService {
   }
 
   async banUser(adminId: string, userId: string, reason: string): Promise<void> {
+    if (adminId === userId) {
+      throw new ForbiddenException('Cannot ban yourself');
+    }
+
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    if (user.is_admin) {
+      throw new ForbiddenException('Cannot ban another admin');
     }
 
     user.is_active = false;
@@ -88,6 +135,29 @@ export class AdminService {
       'user',
       userId,
       { reason },
+    );
+  }
+
+  async unbanUser(adminId: string, userId: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.is_active) {
+      throw new BadRequestException('User is not banned');
+    }
+
+    user.is_active = true;
+    await this.userRepository.save(user);
+
+    await this.logAdminAction(
+      adminId,
+      AdminActionType.UNBAN_USER,
+      'user',
+      userId,
+      {},
     );
   }
 

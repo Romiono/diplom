@@ -45,7 +45,6 @@ export class AdminAction {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => User)
   @JoinColumn({ name: 'admin_id' })
   admin: User;
