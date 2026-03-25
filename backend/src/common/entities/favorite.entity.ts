@@ -20,7 +20,6 @@ export class Favorite {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;

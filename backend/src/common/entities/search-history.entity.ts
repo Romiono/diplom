@@ -31,7 +31,6 @@ export class SearchHistory {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'user_id' })
   user: User;

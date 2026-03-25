@@ -35,7 +35,6 @@ export class Category {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => Category, (category) => category.children, {
     nullable: true,
   })
