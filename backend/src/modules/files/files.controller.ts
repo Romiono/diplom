@@ -19,7 +19,7 @@ export class FilesController {
   @UseInterceptors(
     FileInterceptor('file', {
       limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
+        fileSize: 5 * 1024 * 1024,
       },
     }),
   )
@@ -28,13 +28,12 @@ export class FilesController {
       throw new BadRequestException('No file uploaded');
     }
 
-    const filePath = await this.filesService.uploadImage(file);
+    const result = await this.filesService.uploadImage(file);
 
     return {
-      url: filePath,
-      filename: file.originalname,
+      url: result.path,
       size: file.size,
-      mimeType: file.mimetype,
+      mimeType: result.mimeType,
     };
   }
 }
