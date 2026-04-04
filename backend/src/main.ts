@@ -9,16 +9,13 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Security
   app.use(helmet());
 
-  // CORS
   app.enableCors({
     origin: configService.get('app.frontendUrl'),
     credentials: true,
   });
 
-  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -30,7 +27,6 @@ async function bootstrap() {
     }),
   );
 
-  // Global prefix
   app.setGlobalPrefix('api');
 
   const port = configService.get('app.port');

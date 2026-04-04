@@ -36,7 +36,6 @@ export class Review {
   @CreateDateColumn()
   created_at: Date;
 
-  // Relations
   @ManyToOne(() => Transaction, (transaction) => transaction.reviews)
   @JoinColumn({ name: 'transaction_id' })
   transaction: Transaction;

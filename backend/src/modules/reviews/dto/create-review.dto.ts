@@ -1,4 +1,11 @@
-import { IsString, IsInt, Min, Max, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsInt, Min, Max, IsOptional, IsUUID, MaxLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+const sanitizeHtml: (dirty: string, options?: object) => string = require('sanitize-html');
+const stripHtml = ({ value }: { value: unknown }): unknown =>
+  typeof value === 'string'
+    ? sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} })
+    : value;
 
 export class CreateReviewDto {
   @IsUUID()
@@ -11,5 +18,7 @@ export class CreateReviewDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(2000)
+  @Transform(stripHtml)
   comment?: string;
 }

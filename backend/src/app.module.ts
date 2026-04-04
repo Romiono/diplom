@@ -3,9 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { BullModule } from '@nestjs/bull';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { APP_GUARD } from '@nestjs/core';
+import * as path from 'path';
 
-// Config
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
@@ -13,7 +14,6 @@ import tonConfig from './config/ton.config';
 import mailConfig from './config/mail.config';
 import securityConfig from './config/security.config';
 
-// Modules
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -28,7 +28,6 @@ import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
-    // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
@@ -41,7 +40,6 @@ import { AdminModule } from './modules/admin/admin.module';
       ],
     }),
 
-    // Database
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) =>
@@ -49,7 +47,6 @@ import { AdminModule } from './modules/admin/admin.module';
       inject: [ConfigService],
     }),
 
-    // Redis & Bull
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -61,7 +58,6 @@ import { AdminModule } from './modules/admin/admin.module';
       inject: [ConfigService],
     }),
 
-    // Rate Limiting
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => [
@@ -73,7 +69,21 @@ import { AdminModule } from './modules/admin/admin.module';
       inject: [ConfigService],
     }),
 
-    // Feature Modules
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => [
+        {
+          rootPath: path.resolve(
+            process.cwd(),
+            configService.get<string>('app.upload.dir'),
+          ),
+          serveRoot: '/uploads',
+          serveStaticOptions: { index: false },
+        },
+      ],
+      inject: [ConfigService],
+    }),
+
     UsersModule,
     AuthModule,
     CategoriesModule,

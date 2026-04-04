@@ -3,11 +3,12 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  UpdateDateColumn,
+  Index,
   ManyToOne,
   JoinColumn,
-  Index,
 } from 'typeorm';
-import { User } from '../../modules/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 export enum EmailNotificationStatus {
   PENDING = 'pending',
@@ -17,13 +18,17 @@ export enum EmailNotificationStatus {
 
 @Entity('email_notifications')
 @Index(['status', 'created_at'])
-@Index(['user_id'])
 export class EmailNotification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Index()
   @Column({ type: 'uuid', nullable: false })
   user_id: string;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: false })
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   email: string;
@@ -56,7 +61,6 @@ export class EmailNotification {
   @CreateDateColumn()
   created_at: Date;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @UpdateDateColumn()
+  updated_at: Date;
 }

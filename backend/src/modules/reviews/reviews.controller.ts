@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -28,13 +29,16 @@ export class ReviewsController {
 
   @Public()
   @Get('user/:userId')
-  async getUserReviews(@Param('userId') userId: string) {
+  async getUserReviews(@Param('userId', ParseUUIDPipe) userId: string) {
     return this.reviewsService.getUserReviews(userId);
   }
 
   @Get('transaction/:transactionId')
   @UseGuards(JwtAuthGuard)
-  async getTransactionReviews(@Param('transactionId') transactionId: string) {
-    return this.reviewsService.getTransactionReviews(transactionId);
+  async getTransactionReviews(
+    @Param('transactionId', ParseUUIDPipe) transactionId: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.reviewsService.getTransactionReviews(transactionId, user.sub);
   }
 }
