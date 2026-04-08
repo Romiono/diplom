@@ -66,7 +66,7 @@ export class FilesService {
     }
 
     return {
-      path: `/uploads/${year}/${month}/${filename}`,
+      path: `/api/uploads/${year}/${month}/${filename}`,
       mimeType: detected.mime,
     };
   }

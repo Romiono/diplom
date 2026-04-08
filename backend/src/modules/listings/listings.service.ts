@@ -54,13 +54,29 @@ export class ListingsService {
     sellerId: string,
     createListingDto: CreateListingDto,
   ): Promise<Listing> {
+    const { image_urls, ...listingData } = createListingDto;
+
     const listing = this.listingRepository.create({
-      ...createListingDto,
+      ...listingData,
       seller_id: sellerId,
       status: ListingStatus.ACTIVE,
     });
 
-    return this.listingRepository.save(listing);
+    const saved = await this.listingRepository.save(listing);
+
+    if (image_urls?.length) {
+      const images = image_urls.map((url, i) =>
+        this.listingImageRepository.create({
+          listing_id: saved.id,
+          image_url: url,
+          order_index: i,
+          is_primary: i === 0,
+        }),
+      );
+      await this.listingImageRepository.save(images);
+    }
+
+    return this.findListing(saved.id);
   }
 
   async search(
@@ -172,8 +188,27 @@ export class ListingsService {
       throw new ForbiddenException('Cannot update non-active listing');
     }
 
-    Object.assign(listing, updateListingDto);
-    return this.listingRepository.save(listing);
+    const { image_urls, ...listingData } = updateListingDto;
+
+    Object.assign(listing, listingData);
+    await this.listingRepository.save(listing);
+
+    if (image_urls !== undefined) {
+      await this.listingImageRepository.delete({ listing_id: id });
+      if (image_urls.length) {
+        const images = image_urls.map((url, i) =>
+          this.listingImageRepository.create({
+            listing_id: id,
+            image_url: url,
+            order_index: i,
+            is_primary: i === 0,
+          }),
+        );
+        await this.listingImageRepository.save(images);
+      }
+    }
+
+    return this.findListing(id);
   }
 
   async remove(id: string, sellerId: string): Promise<void> {
@@ -195,11 +230,11 @@ export class ListingsService {
 
   async getUserListings(
     userId: string,
-    requestingUserId: string,
+    requestingUserId: string | null,
     page = 1,
     limit = 20,
   ): Promise<PaginatedResult<Listing>> {
-    const isOwner = userId === requestingUserId;
+    const isOwner = !!requestingUserId && userId === requestingUserId;
     const statusFilter = isOwner
       ? undefined
       : In(PUBLIC_VISIBLE_STATUSES);

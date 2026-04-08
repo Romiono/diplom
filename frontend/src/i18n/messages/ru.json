@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Главная",
+    "listings": "Объявления",
+    "messages": "Сообщения",
+    "transactions": "Сделки",
+    "profile": "Профиль",
+    "notifications": "Уведомления",
+    "myListings": "Мои объявления",
+    "signIn": "Войти",
+    "signOut": "Выйти"
+  },
+  "auth": {
+    "connectWallet": "Подключить кошелёк",
+    "signIn": "Войти",
+    "signing": "Подписание..."
+  },
+  "listing": {
+    "create": "Создать объявление",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "buy": "Купить за {price} TON",
+    "message": "Написать продавцу",
+    "noListings": "Объявлений нет",
+    "status": {
+      "active": "Активно",
+      "sold": "Продано",
+      "reserved": "Зарезервировано",
+      "removed": "Удалено",
+      "disputed": "Спор"
+    },
+    "condition": {
+      "new": "Новое",
+      "used": "Б/у",
+      "refurbished": "Восстановленное"
+    },
+    "sort": {
+      "created_at": "По дате",
+      "price": "По цене",
+      "views_count": "По просмотрам"
+    }
+  },
+  "transaction": {
+    "payNow": "Оплатить через TON",
+    "confirmReceipt": "Подтвердить получение",
+    "openDispute": "Открыть спор",
+    "purchases": "Покупки",
+    "sales": "Продажи",
+    "noTransactions": "Сделок нет",
+    "status": {
+      "pending": "Ожидает оплаты",
+      "paid": "Оплачено",
+      "confirmed": "Подтверждено",
+      "completed": "Завершено",
+      "disputed": "Спор",
+      "refunded": "Возвращено",
+      "cancelled": "Отменено"
+    },
+    "steps": {
+      "created": "Создана",
+      "paid": "Оплачена",
+      "confirmed": "Подтверждена",
+      "completed": "Завершена",
+      "disputed": "Спор"
+    }
+  },
+  "review": {
+    "title": "Оставить отзыв",
+    "rating": "Оценка",
+    "comment": "Комментарий",
+    "submit": "Отправить отзыв",
+    "noReviews": "Отзывов нет"
+  },
+  "message": {
+    "noChats": "Чатов нет",
+    "typeMessage": "Написать сообщение...",
+    "send": "Отправить"
+  },
+  "notification": {
+    "noNotifications": "Уведомлений нет",
+    "status": {
+      "pending": "Отправляется",
+      "sent": "Отправлено",
+      "failed": "Ошибка"
+    }
+  },
+  "profile": {
+    "editProfile": "Редактировать профиль",
+    "username": "Имя пользователя",
+    "displayName": "Отображаемое имя",
+    "email": "Email",
+    "avatarUrl": "Ссылка на аватар",
+    "save": "Сохранить",
+    "rating": "Рейтинг",
+    "sales": "Продаж",
+    "purchases": "Покупок"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "notFound": "Не найдено",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "confirm": "Подтвердить",
+    "delete": "Удалить",
+    "search": "Поиск",
+    "filter": "Фильтры",
+    "prev": "Назад",
+    "next": "Вперёд",
+    "page": "Страница {current} из {total}",
+    "viewAll": "Смотреть все",
+    "noResults": "Ничего не найдено",
+    "tryAgain": "Попробовать снова"
+  }
+}

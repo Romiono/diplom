@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, Matches } from 'class-validator';
 
 export class TonAuthDto {
   @IsString()
@@ -22,4 +22,17 @@ export class TonAuthDto {
   @IsString()
   @IsNotEmpty()
   payload: string;
+
+  /** Present when using TonConnect ton_proof flow */
+  @IsOptional()
+  @IsNumber()
+  timestamp?: number;
+
+  @IsOptional()
+  @IsString()
+  domain?: string;
+
+  @IsOptional()
+  @IsNumber()
+  domainLen?: number;
 }

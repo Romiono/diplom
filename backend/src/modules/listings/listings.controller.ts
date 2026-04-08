@@ -63,11 +63,11 @@ export class ListingsController {
     return this.listingsService.remove(id, user.sub);
   }
 
+  @Public()
   @Get('user/:userId')
-  @UseGuards(JwtAuthGuard)
   async getUserListings(
     @Param('userId', ParseUUIDPipe) userId: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: JwtPayload | undefined,
     @Query('page') page = 1,
     @Query('limit') limit = 20,
   ) {
@@ -75,7 +75,7 @@ export class ListingsController {
     const limitNum = Math.min(100, Math.max(1, Number(limit) || 20));
     return this.listingsService.getUserListings(
       userId,
-      user.sub,
+      user?.sub ?? null,
       pageNum,
       limitNum,
     );

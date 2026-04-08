@@ -77,7 +77,7 @@ import { AdminModule } from './modules/admin/admin.module';
             process.cwd(),
             configService.get<string>('app.upload.dir'),
           ),
-          serveRoot: '/uploads',
+          serveRoot: '/api/uploads',
           serveStaticOptions: { index: false },
         },
       ],

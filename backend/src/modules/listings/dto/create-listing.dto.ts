@@ -7,6 +7,8 @@ import {
   IsInt,
   Min,
   IsNotEmpty,
+  IsArray,
+  ArrayMaxSize,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ListingCondition } from '../entities/listing.entity';
@@ -48,4 +50,11 @@ export class CreateListingDto {
   @IsString()
   @MaxLength(200)
   location?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(500, { each: true })
+  @ArrayMaxSize(10)
+  image_urls?: string[];
 }

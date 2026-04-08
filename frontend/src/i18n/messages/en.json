@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Home",
+    "listings": "Listings",
+    "messages": "Messages",
+    "transactions": "Transactions",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "myListings": "My Listings",
+    "signIn": "Sign In",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "connectWallet": "Connect Wallet",
+    "signIn": "Sign In",
+    "signing": "Signing..."
+  },
+  "listing": {
+    "create": "Create Listing",
+    "edit": "Edit",
+    "delete": "Delete",
+    "buy": "Buy for {price} TON",
+    "message": "Message Seller",
+    "noListings": "No listings found",
+    "status": {
+      "active": "Active",
+      "sold": "Sold",
+      "reserved": "Reserved",
+      "removed": "Removed",
+      "disputed": "Disputed"
+    },
+    "condition": {
+      "new": "New",
+      "used": "Used",
+      "refurbished": "Refurbished"
+    },
+    "sort": {
+      "created_at": "By Date",
+      "price": "By Price",
+      "views_count": "By Views"
+    }
+  },
+  "transaction": {
+    "payNow": "Pay via TON",
+    "confirmReceipt": "Confirm Receipt",
+    "openDispute": "Open Dispute",
+    "purchases": "Purchases",
+    "sales": "Sales",
+    "noTransactions": "No transactions",
+    "status": {
+      "pending": "Awaiting Payment",
+      "paid": "Paid",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "disputed": "Disputed",
+      "refunded": "Refunded",
+      "cancelled": "Cancelled"
+    },
+    "steps": {
+      "created": "Created",
+      "paid": "Paid",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "disputed": "Disputed"
+    }
+  },
+  "review": {
+    "title": "Leave a Review",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submit": "Submit Review",
+    "noReviews": "No reviews yet"
+  },
+  "message": {
+    "noChats": "No chats yet",
+    "typeMessage": "Type a message...",
+    "send": "Send"
+  },
+  "notification": {
+    "noNotifications": "No notifications",
+    "status": {
+      "pending": "Pending",
+      "sent": "Sent",
+      "failed": "Failed"
+    }
+  },
+  "profile": {
+    "editProfile": "Edit Profile",
+    "username": "Username",
+    "displayName": "Display Name",
+    "email": "Email",
+    "avatarUrl": "Avatar URL",
+    "save": "Save",
+    "rating": "Rating",
+    "sales": "Sales",
+    "purchases": "Purchases"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "notFound": "Not found",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filters",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {current} of {total}",
+    "viewAll": "View All",
+    "noResults": "No results found",
+    "tryAgain": "Try Again"
+  }
+}
