@@ -9,7 +9,7 @@ dayjs.extend(relativeTime);
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 export const formatTON = (amount: number, decimals = 2): string =>
-  `${amount.toFixed(decimals)} TON`;
+  `${Number(amount).toFixed(decimals)} TON`;
 
 export const formatNanoTON = (nano: string): string => {
   const ton = Number(BigInt(nano)) / 1e9;

@@ -5,6 +5,7 @@
 # Logs
 logs
 *.log
+*.md
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
@@ -36,6 +37,7 @@ lerna-debug.log*
 
 # Environment
 .env
+.env:example
 .env.local
 .env.production
 

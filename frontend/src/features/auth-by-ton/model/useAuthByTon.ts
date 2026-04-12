@@ -1,9 +1,19 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useTonConnectUI, useTonWallet, useTonAddress } from '@tonconnect/ui-react';
+import { Address } from '@ton/core';
 import { useAuthStore } from '@entities/user/model/auth.store';
 import { usersApi } from '@entities/user/api/usersApi';
 import { toast } from 'sonner';
+
+/** Converts raw TON address (0:abc...) to user-friendly EQ/UQ format */
+function toFriendlyAddress(raw: string): string {
+  try {
+    return Address.parse(raw).toString({ bounceable: true, testOnly: false });
+  } catch {
+    return raw;
+  }
+}
 
 function generateNonce(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -45,7 +55,7 @@ export function useAuthByTon() {
       setIsPending(true);
       try {
         const result = await usersApi.tonConnect({
-          walletAddress: wallet.account.address,
+          walletAddress: toFriendlyAddress(wallet.account.address),
           publicKey: wallet.account.publicKey ?? '',
           signature: proof.signature,
           payload: proof.payload,
