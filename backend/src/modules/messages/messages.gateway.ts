@@ -95,14 +95,18 @@ export class MessagesGateway implements OnGatewayConnection {
     @MessageBody() data: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const senderId = (client.data.user as JwtPayload).sub;
-
     try {
+      const user = client.data.user as JwtPayload | undefined;
+      if (!user) {
+        throw new WsException('Not authenticated');
+      }
+      const senderId = user.sub;
       const message = await this.messagesService.create(senderId, data);
       const room = `listing:${data.listing_id}`;
       this.server.to(room).emit('message:new', message);
       return { event: 'message:sent', data: message };
     } catch (error) {
+      if (error instanceof WsException) throw error;
       throw new WsException(
         (error as Error).message || 'Failed to send message',
       );
@@ -114,7 +118,9 @@ export class MessagesGateway implements OnGatewayConnection {
     @MessageBody() data: TypingDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const userId = (client.data.user as JwtPayload).sub;
+    const user = client.data.user as JwtPayload | undefined;
+    if (!user) return;
+    const userId = user.sub;
     const room = `listing:${data.listingId}`;
     client.to(room).emit('message:typing', { userId });
   }

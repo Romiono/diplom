@@ -13,24 +13,27 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtPayload } from '../../common/interfaces/request-with-user.interface';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Public } from '../../common/decorators/public.decorator';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
+  @Public()
+  @UseGuards(JwtAuthGuard)
   async getProfile(
     @Param('id', ParseUUIDPipe) id: string,
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() user: JwtPayload | null,
   ) {
-    if (user.sub === id || user.isAdmin) {
+    if (user && (user.sub === id || user.isAdmin)) {
       return this.usersService.getOwnProfile(id);
     }
     return this.usersService.getProfile(id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -44,6 +47,7 @@ export class UsersController {
   }
 
   @Get(':id/stats')
+  @UseGuards(JwtAuthGuard)
   async getUserStats(@Param('id', ParseUUIDPipe) id: string) {
     const user = await this.usersService.findOne(id);
     return {

@@ -1,18 +1,16 @@
 'use client';
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 
 export function LocaleSwitcher() {
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname(); // returns path WITHOUT locale prefix
 
   const toggle = () => {
     const next = locale === 'ru' ? 'en' : 'ru';
-    // pathname starts with /{locale}/... — replace only the locale segment
-    const newPath = (pathname ?? `/${locale}`).replace(`/${locale}`, `/${next}`);
-    router.push(newPath);
+    router.replace(pathname, { locale: next });
   };
 
   return (

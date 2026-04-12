@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Star } from 'lucide-react';
 import { truncateAddress } from '@shared/lib/utils';
 import { UserAvatar } from './UserAvatar';
@@ -24,7 +24,7 @@ export function UserCard({ user, showRating = true }: Props) {
       {showRating && (
         <div className="ml-auto flex items-center gap-1 text-sm text-muted-foreground shrink-0">
           <Star className="size-3.5 fill-amber-400 text-amber-400" />
-          <span>{user.rating.toFixed(1)}</span>
+          <span>{Number(user.rating).toFixed(1)}</span>
         </div>
       )}
     </Link>

@@ -5,6 +5,8 @@ import { Providers } from '@app/providers';
 import { Toaster } from 'sonner';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+import { Navbar } from '@widgets/navbar';
+import { Footer } from '@widgets/footer';
 
 export default async function LocaleLayout({
   children,
@@ -25,7 +27,9 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <Providers>
-          {children}
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
           <Toaster position="top-right" richColors />
         </Providers>
       </ThemeProvider>

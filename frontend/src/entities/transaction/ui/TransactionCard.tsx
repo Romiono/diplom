@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatusBadge } from '@shared/ui/StatusBadge';
 import { formatTON, formatRelative } from '@shared/lib/utils';

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { formatRelative, toAbsoluteUrl } from '@shared/lib/utils';
 import type { Chat } from '@shared/types/api';

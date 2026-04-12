@@ -11,8 +11,17 @@ async function bootstrap() {
 
   app.use(helmet());
 
+  const frontendUrl = configService.get<string>('app.frontendUrl') ?? 'http://localhost:3001';
+  const allowedOrigins = frontendUrl.split(',').map((u) => u.trim());
+
   app.enableCors({
-    origin: configService.get('app.frontendUrl'),
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
   });
 

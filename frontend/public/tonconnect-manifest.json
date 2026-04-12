@@ -1,5 +1,5 @@
 {
-  "url": "http://localhost:3001",
+  "url": "http://10.133.132.229:3001",
   "name": "TON Marketplace",
-  "iconUrl": "http://localhost:3001/icon.png"
+  "iconUrl": "http://10.133.132.229:3001/globe.svg"
 }

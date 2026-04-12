@@ -5,6 +5,17 @@ import { useAuthStore } from '@entities/user/model/auth.store';
 import { usersApi } from '@entities/user/api/usersApi';
 import { toast } from 'sonner';
 
+function generateNonce(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for HTTP (non-secure) contexts
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
 export function useAuthByTon() {
   const [tonConnectUI] = useTonConnectUI();
   const wallet = useTonWallet();
@@ -13,7 +24,7 @@ export function useAuthByTon() {
   const [isPending, setIsPending] = useState(false);
 
   const connect = useCallback(async () => {
-    const payload = crypto.randomUUID();
+    const payload = generateNonce();
     tonConnectUI.setConnectRequestParameters({
       state: 'ready',
       value: { tonProof: payload },
