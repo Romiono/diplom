@@ -34,6 +34,13 @@ export function useAuthByTon() {
   const [isPending, setIsPending] = useState(false);
 
   const connect = useCallback(async () => {
+    // If a wallet session is already stored (e.g. from a previous tab or reload)
+    // but we have no auth token, the stored connection has no usable tonProof.
+    // Disconnect first so TonConnect can request a fresh proof on reconnect.
+    if (tonConnectUI.wallet) {
+      await tonConnectUI.disconnect();
+    }
+
     const payload = generateNonce();
     tonConnectUI.setConnectRequestParameters({
       state: 'ready',

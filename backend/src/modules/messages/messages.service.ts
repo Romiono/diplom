@@ -39,6 +39,15 @@ export class MessagesService {
     page: number,
     limit: number,
   ): Promise<PaginatedResult<Message>> {
+    const totalInChat = await this.messageRepository.count({
+      where: { listing_id: listingId },
+    });
+
+    // No messages yet — return empty result (new conversation)
+    if (totalInChat === 0) {
+      return { data: [], total: 0, page, limit, totalPages: 0 };
+    }
+
     const participantCheck = await this.messageRepository.findOne({
       where: [
         { listing_id: listingId, sender_id: userId },

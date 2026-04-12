@@ -19,7 +19,7 @@ export function PayButton({ transaction }: Props) {
   return (
     <Button onClick={pay} disabled={isPending} size="lg">
       <Wallet className="size-4 mr-2" />
-      {isPending ? 'Ожидание...' : `${t('payNow')} · ${formatTON(transaction.amount)} TON`}
+      {isPending ? 'Ожидание...' : `${t('payNow')} · ${formatTON(transaction.amount)}`}
     </Button>
   );
 }

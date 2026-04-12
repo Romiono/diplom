@@ -41,11 +41,12 @@ export function EscrowInfo({ contractAddress }: Props) {
       {data && (
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
           <span className="text-muted-foreground">Balance</span>
-          <span className="font-medium">{(Number(data.balance) / 1e9).toFixed(4)} TON</span>
-          {data.state && (
+          {/* backend returns amount already in TON (not nanoton) */}
+          <span className="font-medium">{Number(data.amount).toFixed(4)} TON</span>
+          {data.status && (
             <>
               <span className="text-muted-foreground">State</span>
-              <span className="font-medium capitalize">{String(data.state)}</span>
+              <span className="font-medium capitalize">{String(data.status)}</span>
             </>
           )}
         </div>

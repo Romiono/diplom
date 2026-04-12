@@ -9,8 +9,14 @@ export interface BalanceResponse {
 
 export interface EscrowState {
   address: string;
-  balance: string;
-  state: string;
+  seller: string;
+  buyer: string;
+  /** Amount in TON (already divided by 1e9 by the backend) */
+  amount: number;
+  status: string; // created | funded | released | refunded
+  timeout: string;
+  admin: string;
+  isDeployed: boolean;
   [key: string]: unknown;
 }
 

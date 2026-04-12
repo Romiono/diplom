@@ -31,11 +31,19 @@ const clearAuth = () => {
   } catch {}
 };
 
+/** In Docker, SSR runs inside a container that can't reach localhost:3000.
+ *  API_INTERNAL_URL is set to http://backend:3000/api in docker-compose.yml.
+ *  Falls back to the public NEXT_PUBLIC_API_URL for non-Docker environments. */
+const serverSideBase =
+  typeof window === 'undefined'
+    ? (process.env.API_INTERNAL_URL ?? env.apiUrl)
+    : env.apiUrl;
+
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken();
   const isFormData = init.body instanceof FormData;
 
-  const res = await fetch(`${env.apiUrl}${path}`, {
+  const res = await fetch(`${serverSideBase}${path}`, {
     ...init,
     headers: {
       ...(!isFormData && { 'Content-Type': 'application/json' }),

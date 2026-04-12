@@ -6,6 +6,7 @@ import {
   Param,
   Query,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -71,11 +72,16 @@ export class TransactionsController {
   }
 
   @Post(':id/payment')
-  @UseGuards(AdminGuard)
   async updatePaymentStatus(
     @Param('id') id: string,
     @Body() updatePaymentDto: UpdatePaymentDto,
+    @CurrentUser() user: JwtPayload,
   ) {
+    // Verify the caller is the buyer of this transaction
+    const transaction = await this.transactionsService.findOne(id, user.sub);
+    if (transaction.buyer_id !== user.sub) {
+      throw new ForbiddenException('Only the buyer can register payment');
+    }
     await this.transactionsService.updatePaymentStatus(id, updatePaymentDto);
     return { message: 'Payment status updated successfully' };
   }

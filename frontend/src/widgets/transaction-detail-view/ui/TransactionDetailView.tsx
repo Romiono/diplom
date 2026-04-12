@@ -1,5 +1,7 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
+import { MessageCircle } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useTransaction } from '@entities/transaction';
 import { TransactionStepper } from '@entities/transaction';
@@ -12,6 +14,14 @@ import { CreateReviewForm } from '@features/review-create';
 import { useTransactionReviews } from '@entities/review';
 import { useAuthStore } from '@entities/user';
 import { formatTON, formatDate } from '@shared/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { ChatRoom } from '@widgets/chat-room';
 
 interface Props {
   transactionId: string;
@@ -22,6 +32,7 @@ export function TransactionDetailView({ transactionId }: Props) {
   const { data: tx, isLoading } = useTransaction(transactionId);
   const { data: reviews } = useTransactionReviews(transactionId);
   const { user } = useAuthStore();
+  const [chatOpen, setChatOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -38,6 +49,7 @@ export function TransactionDetailView({ transactionId }: Props) {
   const hasReview = reviews?.some((r) => r.reviewer_id === user.id);
   const isBuyer = user.id === tx.buyer_id;
   const counterparty = isBuyer ? tx.seller : tx.buyer;
+  const counterpartyName = counterparty?.display_name ?? counterparty?.username ?? 'Собеседник';
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -76,7 +88,34 @@ export function TransactionDetailView({ transactionId }: Props) {
         {isBuyer && <PayButton transaction={tx} />}
         {isBuyer && <ConfirmButton transaction={tx} buyerId={user.id} />}
         <DisputeDialog transaction={tx} currentUserId={user.id} />
+        <Button variant="outline" size="lg" onClick={() => setChatOpen(true)}>
+          <MessageCircle className="size-4 mr-2" />
+          Написать {isBuyer ? 'продавцу' : 'покупателю'}
+        </Button>
       </div>
+
+      {/* Chat sheet */}
+      <Sheet open={chatOpen} onOpenChange={setChatOpen}>
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-md flex flex-col p-0"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <SheetHeader className="px-4 py-3 border-b">
+            <SheetTitle className="text-sm font-medium">
+              Чат с {counterpartyName}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 min-h-0">
+            {counterparty && (
+              <ChatRoom
+                listingId={tx.listing_id}
+                receiverId={counterparty.id}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Review form after completion */}
       {tx.status === 'completed' && !hasReview && (

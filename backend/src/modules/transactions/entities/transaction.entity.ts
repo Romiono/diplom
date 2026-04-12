@@ -47,7 +47,7 @@ export class Transaction {
   @Column({ type: 'varchar', length: 48, nullable: true })
   escrow_contract_address: string;
 
-  @Column({ type: 'varchar', length: 44, nullable: true })
+  @Column({ type: 'text', nullable: true })
   tx_hash: string;
 
   @Column({ type: 'bigint', nullable: true })
