@@ -56,7 +56,7 @@ export function useChat(listingId: string) {
     socketRef.current?.emit('message:typing', { listingId });
   };
 
-  // Дедупликация: история + realtime
+  
   const historyMessages = historyData?.data ?? [];
   const realtimeIds = new Set(realtimeMessages.map((m) => m.id));
   const allMessages = [

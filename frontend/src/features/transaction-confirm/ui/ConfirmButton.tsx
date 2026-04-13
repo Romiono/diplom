@@ -25,7 +25,7 @@ export function ConfirmButton({ transaction, buyerId }: Props) {
   const t = useTranslations('transaction');
   const { mutate, isPending } = useConfirmTransaction(transaction.id);
 
-  // Only buyer can confirm, and only when paid
+  
   if (transaction.status !== 'paid' || transaction.buyer_id !== buyerId) return null;
 
   return (

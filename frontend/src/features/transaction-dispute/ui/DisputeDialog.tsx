@@ -28,7 +28,7 @@ export function DisputeDialog({ transaction, currentUserId }: Props) {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
 
-  // Only buyer or seller can open dispute on a paid transaction
+  
   const canDispute =
     transaction.status === 'paid' &&
     (transaction.buyer_id === currentUserId || transaction.seller_id === currentUserId);

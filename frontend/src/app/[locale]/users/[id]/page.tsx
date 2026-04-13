@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
 import { UserProfilePage } from '@pages/user-profile/ui/UserProfilePage';
 import { env } from '@shared/config/env';
 
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { id } = await params;
+  const { id, locale } = await params;
+  setRequestLocale(locale);
   return <UserProfilePage id={id} />;
 }

@@ -10,7 +10,7 @@ export const useCategories = () =>
   useQuery({
     queryKey: categoryKeys.all,
     queryFn: () => categoriesApi.getAll(),
-    staleTime: 1000 * 60 * 10, // categories rarely change
+    staleTime: 1000 * 60 * 10, 
   });
 
 export const useCategory = (id: number) =>

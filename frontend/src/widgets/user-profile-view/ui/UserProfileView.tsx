@@ -18,7 +18,6 @@ export function UserProfileView({ userId }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-4">
         <UserAvatar user={user} size="lg" />
         <div>

@@ -1,3 +1,5 @@
+'use client';
+import { useLocale, useTranslations } from 'next-intl';
 import { Bell } from 'lucide-react';
 import { cn, formatRelative } from '@shared/lib/utils';
 import type { EmailNotification } from '@shared/types/api';
@@ -13,6 +15,9 @@ const statusStyles: Record<EmailNotification['status'], string> = {
 };
 
 export function NotificationItem({ notification }: Props) {
+  const t = useTranslations('notification');
+  const locale = useLocale();
+
   return (
     <div className="flex items-start gap-3 py-3 border-b last:border-0">
       <div className="mt-0.5 p-1.5 rounded-full bg-muted shrink-0">
@@ -22,10 +27,10 @@ export function NotificationItem({ notification }: Props) {
         <p className="text-sm font-medium truncate">{notification.subject}</p>
         <div className="flex items-center gap-2 mt-0.5">
           <span className={cn('text-xs font-medium', statusStyles[notification.status])}>
-            {notification.status}
+            {t(`status.${notification.status}`)}
           </span>
           <span className="text-xs text-muted-foreground">
-            {formatRelative(notification.created_at)}
+            {formatRelative(notification.created_at, locale)}
           </span>
         </div>
       </div>

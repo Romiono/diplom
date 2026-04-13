@@ -17,6 +17,7 @@
     "signing": "Signing..."
   },
   "listing": {
+    "seller": "Seller",
     "create": "Create Listing",
     "edit": "Edit",
     "delete": "Delete",
@@ -39,15 +40,28 @@
       "created_at": "By Date",
       "price": "By Price",
       "views_count": "By Views"
+    },
+    "filter": {
+      "category": "Category",
+      "allCategories": "All categories",
+      "priceFrom": "Price from",
+      "priceTo": "Price to",
+      "condition": "Condition",
+      "anyCondition": "Any",
+      "sort": "Sort by",
+      "location": "Location"
     }
   },
   "transaction": {
+    "title": "My Transactions",
     "payNow": "Pay via TON",
     "confirmReceipt": "Confirm Receipt",
     "openDispute": "Open Dispute",
     "purchases": "Purchases",
     "sales": "Sales",
     "noTransactions": "No transactions",
+    "noPurchases": "No purchases",
+    "noSales": "No sales",
     "status": {
       "pending": "Awaiting Payment",
       "paid": "Paid",
@@ -67,17 +81,22 @@
   },
   "review": {
     "title": "Leave a Review",
+    "sellerReviews": "Seller Reviews",
     "rating": "Rating",
     "comment": "Comment",
     "submit": "Submit Review",
     "noReviews": "No reviews yet"
   },
   "message": {
+    "title": "Messages",
     "noChats": "No chats yet",
     "typeMessage": "Type a message...",
-    "send": "Send"
+    "send": "Send",
+    "toListing": "Go to listing",
+    "noMessages": "No messages in this chat yet"
   },
   "notification": {
+    "title": "Notifications",
     "noNotifications": "No notifications",
     "status": {
       "pending": "Pending",
@@ -92,6 +111,8 @@
     "email": "Email",
     "avatarUrl": "Avatar URL",
     "save": "Save",
+    "saving": "Saving...",
+    "clickToChangePhoto": "Click photo to change",
     "rating": "Rating",
     "sales": "Sales",
     "purchases": "Purchases"

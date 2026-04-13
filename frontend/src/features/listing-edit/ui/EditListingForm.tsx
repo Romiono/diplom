@@ -37,7 +37,7 @@ export function EditListingForm({ listing, onSuccess }: Props) {
   const [condition, setCondition] = useState(listing.condition ?? '');
   const [location, setLocation] = useState(listing.location ?? '');
 
-  // Existing images from the listing
+  
   const [existingUrls, setExistingUrls] = useState<string[]>(
     listing.images.map((i) => i.image_url),
   );

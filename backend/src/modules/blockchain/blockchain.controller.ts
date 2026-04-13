@@ -39,9 +39,7 @@ export class BlockchainController {
     private readonly escrowService: EscrowService,
   ) {}
 
-  /**
-   * Health check для TON подключения
-   */
+  
   @Public()
   @Get('health')
   async healthCheck() {
@@ -64,9 +62,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Получить баланс адреса
-   */
+  
   @Public()
   @Get('balance/:address')
   async getBalance(@Param('address') address: string) {
@@ -88,9 +84,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Проверить валидность адреса
-   */
+  
   @Public()
   @Get('validate/:address')
   async validateAddress(@Param('address') address: string) {
@@ -101,9 +95,7 @@ export class BlockchainController {
     };
   }
 
-  /**
-   * Деплой escrow контракта (для тестирования)
-   */
+  
   @Post('escrow/deploy')
   @UseGuards(AdminGuard)
   async deployEscrow(@Body() dto: DeployEscrowDto) {
@@ -139,9 +131,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Получить состояние escrow контракта
-   */
+  
   @Public()
   @Get('escrow/:address')
   async getEscrowState(@Param('address') address: string) {
@@ -159,9 +149,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Fund escrow контракта (для тестирования)
-   */
+  
   @Post('escrow/:address/fund')
   @UseGuards(AdminGuard)
   async fundEscrow(@Param('address') address: string) {
@@ -184,9 +172,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Release средств (для тестирования, обычно вызывается через transactions API)
-   */
+  
   @Post('escrow/:address/release')
   @UseGuards(AdminGuard)
   async releaseEscrow(@Param('address') address: string) {
@@ -209,9 +195,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Refund средств (для тестирования)
-   */
+  
   @Post('escrow/:address/refund')
   @UseGuards(AdminGuard)
   async refundEscrow(@Param('address') address: string) {
@@ -234,9 +218,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Получить транзакции контракта
-   */
+  
   @Public()
   @Get('transactions/:address')
   async getTransactions(
@@ -262,9 +244,7 @@ export class BlockchainController {
     }
   }
 
-  /**
-   * Проверить, задеплоен ли контракт
-   */
+  
   @Public()
   @Get('contract/:address/deployed')
   async isContractDeployed(@Param('address') address: string) {

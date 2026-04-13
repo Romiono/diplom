@@ -20,6 +20,7 @@ interface Props {
 
 export function ListingDetailView({ listingId }: Props) {
   const t = useTranslations('listing');
+  const tReview = useTranslations('review');
   const locale = useLocale();
   const { data: listing, isLoading } = useListing(listingId);
   const { data: reviews } = useUserReviews(listing?.seller.id ?? '');
@@ -51,7 +52,7 @@ export function ListingDetailView({ listingId }: Props) {
           </div>
           <p className="text-3xl font-bold text-primary">{formatTON(listing.price)}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            {formatDate(listing.created_at)}
+            {formatDate(listing.created_at, locale)}
           </p>
         </div>
 
@@ -87,13 +88,13 @@ export function ListingDetailView({ listingId }: Props) {
         </div>
 
         <div className="border rounded-lg p-4">
-          <p className="text-sm font-medium mb-3">Продавец</p>
+          <p className="text-sm font-medium mb-3">{t('seller')}</p>
           <UserCard user={listing.seller} />
         </div>
 
         {reviews && reviews.length > 0 && (
           <div>
-            <h3 className="font-semibold mb-3">Отзывы о продавце</h3>
+            <h3 className="font-semibold mb-3">{tReview('sellerReviews')}</h3>
             <div className="space-y-3">
               {reviews.slice(0, 3).map((r) => (
                 <ReviewCard key={r.id} review={r} />

@@ -6,7 +6,6 @@ import { useAuthStore } from '@entities/user/model/auth.store';
 import { usersApi } from '@entities/user/api/usersApi';
 import { toast } from 'sonner';
 
-/** Converts raw TON address (0:abc...) to user-friendly EQ/UQ format */
 function toFriendlyAddress(raw: string): string {
   try {
     return Address.parse(raw).toString({ bounceable: true, testOnly: false });
@@ -19,7 +18,7 @@ function generateNonce(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  // Fallback for HTTP (non-secure) contexts
+  
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
     return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
@@ -34,9 +33,9 @@ export function useAuthByTon() {
   const [isPending, setIsPending] = useState(false);
 
   const connect = useCallback(async () => {
-    // If a wallet session is already stored (e.g. from a previous tab or reload)
-    // but we have no auth token, the stored connection has no usable tonProof.
-    // Disconnect first so TonConnect can request a fresh proof on reconnect.
+    
+    
+    
     if (tonConnectUI.wallet) {
       await tonConnectUI.disconnect();
     }
@@ -49,7 +48,7 @@ export function useAuthByTon() {
     await tonConnectUI.openModal();
   }, [tonConnectUI]);
 
-  // Authenticate as soon as wallet provides a ton_proof
+  
   useEffect(() => {
     if (isAuthenticated || !wallet || isPending) return;
 
@@ -80,7 +79,7 @@ export function useAuthByTon() {
     };
 
     authenticate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [wallet?.connectItems?.tonProof, isAuthenticated]);
 
   const disconnect = useCallback(async () => {

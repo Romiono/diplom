@@ -6,22 +6,22 @@ type StatusType = ListingStatus | TransactionStatus | NotificationStatus;
 type Ns = 'listing' | 'transaction' | 'notification';
 
 const VARIANT_MAP: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  // listing
+  
   active: 'default',
   sold: 'secondary',
   reserved: 'outline',
   removed: 'outline',
-  // transaction
+  
   pending: 'outline',
   paid: 'default',
   confirmed: 'default',
   completed: 'default',
   refunded: 'secondary',
   cancelled: 'outline',
-  // shared disputed / failed
+  
   disputed: 'destructive',
   failed: 'destructive',
-  // notification
+  
   sent: 'default',
 };
 

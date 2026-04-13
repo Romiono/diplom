@@ -23,7 +23,7 @@ export class TonAuthDto {
   @IsNotEmpty()
   payload: string;
 
-  /** Present when using TonConnect ton_proof flow */
+  
   @IsOptional()
   @IsNumber()
   timestamp?: number;

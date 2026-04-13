@@ -17,19 +17,14 @@ import { JwtPayload } from '../../common/interfaces/request-with-user.interface'
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
-  /**
-   * GET /messages/chats — list all conversations (grouped by listing) for the current user
-   */
+  
   @Get('chats')
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   async getMyChats(@CurrentUser() user: JwtPayload) {
     return this.messagesService.getUserChats(user.sub);
   }
 
-  /**
-   * GET /messages/history/:listingId — message history for a specific listing chat
-   * Only buyer or seller of that listing may access it.
-   */
+  
   @Get('history/:listingId')
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   async getListingHistory(

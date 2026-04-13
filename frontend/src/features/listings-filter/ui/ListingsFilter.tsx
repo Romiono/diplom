@@ -68,16 +68,16 @@ export function ListingsFilter({ onClose }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label>Категория</Label>
+        <Label>{t('listing.filter.category')}</Label>
         <Select
           value={current.category_id?.toString() ?? 'all'}
           onValueChange={(v) => apply({ category_id: v === 'all' ? undefined : Number(v) })}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Все категории" />
+            <SelectValue placeholder={t('listing.filter.allCategories')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все категории</SelectItem>
+            <SelectItem value="all">{t('listing.filter.allCategories')}</SelectItem>
             {categories?.map((c) => (
               <SelectItem key={c.id} value={String(c.id)}>
                 {c.icon ? `${c.icon} ` : ''}{c.name}
@@ -89,7 +89,7 @@ export function ListingsFilter({ onClose }: Props) {
 
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-2">
-          <Label>Цена от</Label>
+          <Label>{t('listing.filter.priceFrom')}</Label>
           <Input
             type="number"
             min={0}
@@ -99,7 +99,7 @@ export function ListingsFilter({ onClose }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Цена до</Label>
+          <Label>{t('listing.filter.priceTo')}</Label>
           <Input
             type="number"
             min={0}
@@ -111,16 +111,16 @@ export function ListingsFilter({ onClose }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label>Состояние</Label>
+        <Label>{t('listing.filter.condition')}</Label>
         <Select
           value={current.condition ?? 'all'}
           onValueChange={(v) => apply({ condition: v === 'all' ? undefined : (v as ListingSearchParams['condition']) })}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Любое" />
+            <SelectValue placeholder={t('listing.filter.anyCondition')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Любое</SelectItem>
+            <SelectItem value="all">{t('listing.filter.anyCondition')}</SelectItem>
             {CONDITIONS.map((c) => (
               <SelectItem key={c} value={c}>{t(`listing.condition.${c}`)}</SelectItem>
             ))}
@@ -129,7 +129,7 @@ export function ListingsFilter({ onClose }: Props) {
       </div>
 
       <div className="space-y-2">
-        <Label>Сортировка</Label>
+        <Label>{t('listing.filter.sort')}</Label>
         <Select
           value={current.sortBy ?? 'created_at'}
           onValueChange={(v) => apply({ sortBy: v as ListingSearchParams['sortBy'] })}

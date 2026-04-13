@@ -25,7 +25,6 @@ export function ListingImageGallery({ listing }: Props) {
 
   return (
     <div className="space-y-2">
-      {/* Main image */}
       <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
         <Image
           src={activeUrl}

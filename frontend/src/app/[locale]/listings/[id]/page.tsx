@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
 import { ListingDetailPage } from '@pages/listing-detail/ui/ListingDetailPage';
 import { env } from '@shared/config/env';
 
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params }: Props) {
-  const { id } = await params;
+  const { id, locale } = await params;
+  setRequestLocale(locale);
   return <ListingDetailPage id={id} />;
 }

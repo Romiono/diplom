@@ -23,8 +23,10 @@ import { JwtPayload } from '../../common/interfaces/request-with-user.interface'
 @WebSocketGateway({
   cors: {
     origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
-      const allowed = process.env.FRONTEND_URL || 'http://localhost:3001';
-      if (!origin || origin === allowed) {
+      const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3001')
+        .split(',')
+        .map((o) => o.trim());
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('WebSocket connection not allowed by CORS'), false);

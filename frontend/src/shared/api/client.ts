@@ -9,10 +9,6 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Читает token напрямую из localStorage чтобы избежать
- * circular dependency между apiFetch и Zustand auth store.
- */
 const getToken = (): string | null => {
   if (typeof window === 'undefined') return null;
   try {
@@ -31,9 +27,6 @@ const clearAuth = () => {
   } catch {}
 };
 
-/** In Docker, SSR runs inside a container that can't reach localhost:3000.
- *  API_INTERNAL_URL is set to http://backend:3000/api in docker-compose.yml.
- *  Falls back to the public NEXT_PUBLIC_API_URL for non-Docker environments. */
 const serverSideBase =
   typeof window === 'undefined'
     ? (process.env.API_INTERNAL_URL ?? env.apiUrl)

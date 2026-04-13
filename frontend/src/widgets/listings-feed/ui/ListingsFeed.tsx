@@ -42,13 +42,11 @@ export function ListingsFeed() {
 
   return (
     <div className="flex gap-6">
-      {/* Desktop sidebar filter */}
       <aside className="hidden lg:block w-64 shrink-0">
         <ListingsFilter />
       </aside>
 
       <div className="flex-1 min-w-0">
-        {/* Mobile filter sheet */}
         <div className="lg:hidden mb-4">
           <Sheet>
             <SheetTrigger asChild>

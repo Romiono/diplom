@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageBubble } from '@entities/message';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function ChatRoom({ listingId, receiverId }: Props) {
+  const t = useTranslations('message');
   const { user } = useAuthStore();
   const { messages, isTyping, connected, sendMessage, sendTyping } =
     useChat(listingId);
@@ -52,7 +54,7 @@ export function ChatRoom({ listingId, receiverId }: Props) {
             sendTyping();
           }}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Написать сообщение..."
+          placeholder={t('typeMessage')}
           disabled={!connected}
         />
         <Button

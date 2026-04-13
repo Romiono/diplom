@@ -23,13 +23,13 @@ export class AuthService {
     const isTonProofFlow = timestamp !== undefined && domain !== undefined && domainLen !== undefined;
 
     if (isTonProofFlow) {
-      // Standard TonConnect ton_proof verification (no server-side nonce required)
+      
       const isValid = this.verifyTonProof(walletAddress, publicKey, signature, payload, timestamp, domain, domainLen);
       if (!isValid) {
         throw new UnauthorizedException('Invalid ton_proof signature or expired proof');
       }
     } else {
-      // Legacy nonce-based flow
+      
       const user = await this.userRepository
         .createQueryBuilder('user')
         .addSelect('user.auth_nonce')
@@ -55,7 +55,7 @@ export class AuthService {
       await this.userRepository.save(user);
     }
 
-    // Find or create user
+    
     let user = await this.userRepository.findOne({ where: { wallet_address: walletAddress } });
     if (!user) {
       user = this.userRepository.create({

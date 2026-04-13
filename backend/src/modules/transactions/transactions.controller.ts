@@ -77,7 +77,7 @@ export class TransactionsController {
     @Body() updatePaymentDto: UpdatePaymentDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    // Verify the caller is the buyer of this transaction
+    
     const transaction = await this.transactionsService.findOne(id, user.sub);
     if (transaction.buyer_id !== user.sub) {
       throw new ForbiddenException('Only the buyer can register payment');

@@ -17,7 +17,7 @@ export function BuyButton({ listingId, price, sellerId }: Props) {
   const { mutate, isPending } = useBuyListing(listingId);
   const { isAuthenticated, user } = useAuthStore();
 
-  // Cannot buy own listing
+  
   if (user?.id === sellerId) return null;
   if (!isAuthenticated) return null;
 

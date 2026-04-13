@@ -17,6 +17,7 @@
     "signing": "Подписание..."
   },
   "listing": {
+    "seller": "Продавец",
     "create": "Создать объявление",
     "edit": "Редактировать",
     "delete": "Удалить",
@@ -39,15 +40,28 @@
       "created_at": "По дате",
       "price": "По цене",
       "views_count": "По просмотрам"
+    },
+    "filter": {
+      "category": "Категория",
+      "allCategories": "Все категории",
+      "priceFrom": "Цена от",
+      "priceTo": "Цена до",
+      "condition": "Состояние",
+      "anyCondition": "Любое",
+      "sort": "Сортировка",
+      "location": "Местоположение"
     }
   },
   "transaction": {
+    "title": "Мои сделки",
     "payNow": "Оплатить через TON",
     "confirmReceipt": "Подтвердить получение",
     "openDispute": "Открыть спор",
     "purchases": "Покупки",
     "sales": "Продажи",
     "noTransactions": "Сделок нет",
+    "noPurchases": "Покупок нет",
+    "noSales": "Продаж нет",
     "status": {
       "pending": "Ожидает оплаты",
       "paid": "Оплачено",
@@ -67,17 +81,22 @@
   },
   "review": {
     "title": "Оставить отзыв",
+    "sellerReviews": "Отзывы о продавце",
     "rating": "Оценка",
     "comment": "Комментарий",
     "submit": "Отправить отзыв",
     "noReviews": "Отзывов нет"
   },
   "message": {
+    "title": "Сообщения",
     "noChats": "Чатов нет",
     "typeMessage": "Написать сообщение...",
-    "send": "Отправить"
+    "send": "Отправить",
+    "toListing": "К объявлению",
+    "noMessages": "Пока нет сообщений в этом чате"
   },
   "notification": {
+    "title": "Уведомления",
     "noNotifications": "Уведомлений нет",
     "status": {
       "pending": "Отправляется",
@@ -92,6 +111,8 @@
     "email": "Email",
     "avatarUrl": "Ссылка на аватар",
     "save": "Сохранить",
+    "saving": "Сохранение...",
+    "clickToChangePhoto": "Нажмите на фото для замены",
     "rating": "Рейтинг",
     "sales": "Продаж",
     "purchases": "Покупок"

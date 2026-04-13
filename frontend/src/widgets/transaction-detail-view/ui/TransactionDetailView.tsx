@@ -59,8 +59,6 @@ export function TransactionDetailView({ transactionId }: Props) {
       </div>
 
       <TransactionStepper status={tx.status} />
-
-      {/* Listing summary */}
       <div className="border rounded-lg p-4">
         <Link
           href={`/${locale}/listings/${tx.listing_id}`}

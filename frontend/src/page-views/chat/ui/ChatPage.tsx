@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ArrowLeft, Loader2, MessageSquareOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ChatRoom } from '@widgets/chat-room';
@@ -14,16 +14,17 @@ interface Props {
 
 export function ChatPage({ listingId }: Props) {
   const locale = useLocale();
+  const t = useTranslations('message');
   const { user } = useAuthStore();
   const { data: listing, isLoading: listingLoading } = useListing(listingId);
   const { data: history, isLoading: historyLoading } = useMessageHistory(listingId);
 
   const isLoading = listingLoading || historyLoading;
 
-  // Определяем receiverId:
-  // 1. Из истории: первое сообщение, где sender_id ≠ user.id
-  // 2. Если истории нет и текущий пользователь — НЕ продавец → получатель = продавец
-  // 3. Если текущий пользователь — продавец и истории нет → ждём первого сообщения от покупателя
+  
+  
+  
+  
   const receiverId = (() => {
     if (!user) return null;
     const messages = history?.data ?? [];
@@ -33,7 +34,7 @@ export function ChatPage({ listingId }: Props) {
     if (other) {
       return other.sender_id === user.id ? other.receiver_id : other.sender_id;
     }
-    // Нет истории: если я не продавец — пишу продавцу
+    
     if (listing && listing.seller_id !== user.id) {
       return listing.seller_id;
     }
@@ -47,7 +48,6 @@ export function ChatPage({ listingId }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-4 max-w-3xl flex flex-col h-[calc(100vh-4rem)]">
-      {/* Header */}
       <div className="flex items-center gap-3 pb-3 border-b mb-3 shrink-0">
         <Button variant="ghost" size="icon" asChild>
           <Link href={`/${locale}/messages`}>
@@ -65,7 +65,7 @@ export function ChatPage({ listingId }: Props) {
         {listing && (
           <Button variant="outline" size="sm" asChild className="ml-auto shrink-0">
             <Link href={`/${locale}/listings/${listingId}`}>
-              К объявлению
+              {t('toListing')}
             </Link>
           </Button>
         )}
@@ -82,7 +82,7 @@ export function ChatPage({ listingId }: Props) {
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
             <MessageSquareOff className="size-10" />
-            <p className="text-sm">Пока нет сообщений в этом чате</p>
+            <p className="text-sm">{t('noMessages')}</p>
           </div>
         )}
       </div>

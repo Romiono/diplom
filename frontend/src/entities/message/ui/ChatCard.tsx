@@ -1,3 +1,4 @@
+import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { formatRelative, toAbsoluteUrl } from '@shared/lib/utils';
@@ -14,6 +15,7 @@ function getChatImage(chat: Chat): string {
 }
 
 export function ChatCard({ chat }: Props) {
+  const locale = useLocale();
   const { listing, lastMessage } = chat;
   const imageUrl = getChatImage(chat);
 
@@ -32,7 +34,7 @@ export function ChatCard({ chat }: Props) {
         <p className="text-xs text-muted-foreground truncate">{lastMessage.content}</p>
       </div>
       <span className="text-xs text-muted-foreground shrink-0">
-        {formatRelative(lastMessage.created_at)}
+        {formatRelative(lastMessage.created_at, locale)}
       </span>
     </Link>
   );

@@ -43,7 +43,7 @@ export class MessagesService {
       where: { listing_id: listingId },
     });
 
-    // No messages yet — return empty result (new conversation)
+    
     if (totalInChat === 0) {
       return { data: [], total: 0, page, limit, totalPages: 0 };
     }

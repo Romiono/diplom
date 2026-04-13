@@ -1,3 +1,4 @@
+import { useLocale } from 'next-intl';
 import { cn, formatRelative } from '@shared/lib/utils';
 import type { Message } from '@shared/types/api';
 
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function MessageBubble({ message, isOwn }: Props) {
+  const locale = useLocale();
   return (
     <div className={cn('flex', isOwn ? 'justify-end' : 'justify-start')}>
       <div
@@ -24,7 +26,7 @@ export function MessageBubble({ message, isOwn }: Props) {
             isOwn ? 'text-primary-foreground/60 text-right' : 'text-muted-foreground',
           )}
         >
-          {formatRelative(message.created_at)}
+          {formatRelative(message.created_at, locale)}
         </p>
       </div>
     </div>

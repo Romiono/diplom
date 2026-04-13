@@ -1,11 +1,10 @@
-// ---- Enums ----
+
 export type ListingStatus = 'active' | 'sold' | 'reserved' | 'removed' | 'disputed';
 export type ListingCondition = 'new' | 'used' | 'refurbished';
 export type TransactionStatus =
   | 'pending' | 'paid' | 'confirmed' | 'disputed' | 'completed' | 'refunded' | 'cancelled';
 export type NotificationStatus = 'pending' | 'sent' | 'failed';
 
-// ---- Entities ----
 export interface User {
   id: string;
   wallet_address: string;
@@ -24,7 +23,7 @@ export interface User {
 export interface ListingImage {
   id: string;
   listing_id: string;
-  image_url: string;   // приходит как "/api/uploads/year/month/filename.ext"
+  image_url: string;   
   order_index: number;
   is_primary: boolean;
   file_size: number | null;
@@ -131,7 +130,6 @@ export interface BlockchainHealth {
   timestamp: string;
 }
 
-// ---- Auth ----
 export interface AuthUser {
   id: string;
   walletAddress: string;
@@ -145,7 +143,6 @@ export interface AuthResponse {
   user: AuthUser;
 }
 
-// ---- Search params ----
 export interface ListingSearchParams {
   query?: string;
   category_id?: number;

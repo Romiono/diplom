@@ -33,7 +33,6 @@ export function TransactionStepper({ status }: Props) {
 
         return (
           <div key={step.key} className="flex items-center flex-1 last:flex-none">
-            {/* Circle */}
             <div className="flex flex-col items-center">
               <div
                 className={cn(
@@ -64,8 +63,6 @@ export function TransactionStepper({ status }: Props) {
                 {isDisputed && step.key === 'confirmed' ? t('disputed') : t(step.key)}
               </span>
             </div>
-
-            {/* Connector line */}
             {!isLast && (
               <div
                 className={cn(

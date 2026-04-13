@@ -47,7 +47,6 @@ export function EditProfileForm({ user, onSuccess }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 max-w-md">
-      {/* Avatar */}
       <div className="flex items-center gap-4">
         <div className="relative">
           <UserAvatar
@@ -63,7 +62,7 @@ export function EditProfileForm({ user, onSuccess }: Props) {
           </button>
         </div>
         <div className="text-sm text-muted-foreground">
-          Нажмите на фото для замены
+          {t('clickToChangePhoto')}
         </div>
         <input
           ref={fileRef}
@@ -90,7 +89,7 @@ export function EditProfileForm({ user, onSuccess }: Props) {
       </div>
 
       <Button type="submit" disabled={isPending}>
-        {isPending ? 'Сохранение...' : t('save')}
+        {isPending ? t('saving') : t('save')}
       </Button>
     </form>
   );
