@@ -1,0 +1,18 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Install dependencies first (cached layer)
+COPY package*.json ./
+RUN npm install
+
+# Copy project files (src/ and public/ are overridden by volume mounts)
+COPY . .
+
+# Make entrypoint executable
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# next dev port (override via PORT env or -p flag)
+EXPOSE 3001
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
