@@ -96,6 +96,7 @@ services:
       NEXT_PUBLIC_TON_NETWORK: testnet
       NEXT_PUBLIC_DEFAULT_LOCALE: ru
       API_INTERNAL_URL: "http://backend:3000/api"
+      BACKEND_INTERNAL_URL: "http://backend:3000"
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
