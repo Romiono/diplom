@@ -11,7 +11,7 @@ echo "[entrypoint] Using APP_URL=${APP_URL}"
 # ─── Write .env.local ─────────────────────────────────────────────────────────
 # next dev reads this file at startup. Written fresh each container start so
 # the tunnel URL is always up to date.
-WS_URL="http://localhost:3000"
+WS_URL="${APP_URL:-http://localhost:3000}"
 
 cat > /app/.env.local <<EOF
 NEXT_PUBLIC_API_URL=/api

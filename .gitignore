@@ -4,9 +4,7 @@
 .DS_Store
 *.log
 
-COMPREHENSIVE_TEST_PLAN.md
-LOCAL_IP_SETUP.md
-PHASE5_PLAN.md
+*.md
 
 backend/uploads/*
 dist
