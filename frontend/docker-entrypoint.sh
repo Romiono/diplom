@@ -36,4 +36,8 @@ EOF
 echo "[entrypoint] tonconnect-manifest.json updated"
 
 # ─── Start Next.js dev server ─────────────────────────────────────────────────
-exec npm run dev
+if [ "$NODE_ENV" = "production" ]; then
+  exec npm run start
+else
+  exec npm run dev
+fi
