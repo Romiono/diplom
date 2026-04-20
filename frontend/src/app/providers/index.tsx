@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { env } from '@shared/config/env';
+import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -16,11 +17,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <TonConnectUIProvider manifestUrl={`${env.appUrl}/tonconnect-manifest.json`}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </TonConnectUIProvider>
+    <ErrorBoundary>
+      <TonConnectUIProvider manifestUrl={`${env.appUrl}/tonconnect-manifest.json`}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </TonConnectUIProvider>
+    </ErrorBoundary>
   );
 }

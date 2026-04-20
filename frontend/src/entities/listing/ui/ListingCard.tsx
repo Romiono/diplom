@@ -15,7 +15,7 @@ interface Props {
 export function ListingCard({ listing, actions }: Props) {
   const imageUrl = getPrimaryImage(listing);
   const sellerName =
-    listing.seller.display_name ?? listing.seller.username ?? listing.seller.wallet_address.slice(0, 8) + '…';
+    listing.seller?.display_name ?? listing.seller?.username ?? (listing.seller?.wallet_address?.slice(0, 8) + '…') ?? '—';
 
   return (
     <Card className="overflow-hidden group hover:shadow-md transition-shadow">

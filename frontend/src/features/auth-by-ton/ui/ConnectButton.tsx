@@ -31,8 +31,8 @@ export function ConnectButton() {
   if (!isAuthenticated || !user) {
     return (
       <Button variant="outline" size="sm" onClick={connect}>
-        <Wallet className="size-4 mr-2" />
-        {t('connectWallet')}
+        <Wallet className="size-4 sm:mr-2" />
+        <span className="hidden sm:inline">{t('connectWallet')}</span>
       </Button>
     );
   }
