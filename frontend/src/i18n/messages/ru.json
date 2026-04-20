@@ -20,7 +20,20 @@
     "seller": "Продавец",
     "create": "Создать объявление",
     "edit": "Редактировать",
+    "editTitle": "Редактировать объявление",
     "delete": "Удалить",
+    "form": {
+      "titleLabel": "Название *",
+      "descriptionLabel": "Описание *",
+      "priceLabel": "Цена (TON) *",
+      "conditionLabel": "Состояние",
+      "categoryLabel": "Категория",
+      "locationLabel": "Местоположение",
+      "photosLabel": "Фотографии (до 10)",
+      "noCategory": "Без категории",
+      "selectPlaceholder": "Выберите...",
+      "saving": "Сохранение..."
+    },
     "buy": "Купить за {price} TON",
     "message": "Написать продавцу",
     "noListings": "Объявлений нет",
@@ -54,6 +67,16 @@
   },
   "transaction": {
     "title": "Мои сделки",
+    "deal": "Сделка",
+    "seller": "Продавец",
+    "buyer": "Покупатель",
+    "createdAt": "Создана",
+    "writeToSeller": "Написать продавцу",
+    "writeToBuyer": "Написать покупателю",
+    "chatWith": "Чат с {name}",
+    "counterparty": "Собеседник",
+    "disputeReason": "Причина спора",
+    "disputeOpenedAt": "Открыт",
     "payNow": "Оплатить через TON",
     "confirmReceipt": "Подтвердить получение",
     "openDispute": "Открыть спор",
@@ -117,9 +140,14 @@
     "sales": "Продаж",
     "purchases": "Покупок"
   },
+  "home": {
+    "subtitle": "Безопасная торговля с эскроу на блокчейне TON"
+  },
   "common": {
     "loading": "Загрузка...",
     "error": "Произошла ошибка",
+    "errorTitle": "Что-то пошло не так",
+    "errorDescription": "Произошла непредвиденная ошибка. Попробуйте обновить страницу.",
     "notFound": "Не найдено",
     "save": "Сохранить",
     "cancel": "Отмена",

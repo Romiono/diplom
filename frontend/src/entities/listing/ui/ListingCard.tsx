@@ -1,6 +1,8 @@
+'use client';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { MapPin, Eye } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatusBadge } from '@shared/ui/StatusBadge';
 import { formatTON, formatRelative } from '@shared/lib/utils';
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export function ListingCard({ listing, actions }: Props) {
+  const locale = useLocale();
   const imageUrl = getPrimaryImage(listing);
   const seller = listing.seller;
   const sellerName = seller
@@ -67,7 +70,7 @@ export function ListingCard({ listing, actions }: Props) {
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground">{formatRelative(listing.created_at)}</p>
+        <p className="text-xs text-muted-foreground">{formatRelative(listing.created_at, locale)}</p>
 
         {actions && <div className="pt-1 border-t">{actions}</div>}
       </CardContent>

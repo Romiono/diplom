@@ -20,7 +20,20 @@
     "seller": "Seller",
     "create": "Create Listing",
     "edit": "Edit",
+    "editTitle": "Edit Listing",
     "delete": "Delete",
+    "form": {
+      "titleLabel": "Title *",
+      "descriptionLabel": "Description *",
+      "priceLabel": "Price (TON) *",
+      "conditionLabel": "Condition",
+      "categoryLabel": "Category",
+      "locationLabel": "Location",
+      "photosLabel": "Photos (up to 10)",
+      "noCategory": "No category",
+      "selectPlaceholder": "Select...",
+      "saving": "Saving..."
+    },
     "buy": "Buy for {price} TON",
     "message": "Message Seller",
     "noListings": "No listings found",
@@ -54,6 +67,16 @@
   },
   "transaction": {
     "title": "My Transactions",
+    "deal": "Transaction",
+    "seller": "Seller",
+    "buyer": "Buyer",
+    "createdAt": "Created",
+    "writeToSeller": "Message seller",
+    "writeToBuyer": "Message buyer",
+    "chatWith": "Chat with {name}",
+    "counterparty": "Counterparty",
+    "disputeReason": "Dispute reason",
+    "disputeOpenedAt": "Opened",
     "payNow": "Pay via TON",
     "confirmReceipt": "Confirm Receipt",
     "openDispute": "Open Dispute",
@@ -117,9 +140,14 @@
     "sales": "Sales",
     "purchases": "Purchases"
   },
+  "home": {
+    "subtitle": "Secure trading with escrow on the TON blockchain"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "An unexpected error occurred. Try refreshing the page.",
     "notFound": "Not found",
     "save": "Save",
     "cancel": "Cancel",

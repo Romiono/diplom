@@ -1,5 +1,5 @@
 'use client';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { AuthGuard } from '@shared/ui/AuthGuard';
@@ -13,6 +13,7 @@ interface Props {
 
 function EditListingContent({ id }: Props) {
   const locale = useLocale();
+  const t = useTranslations('listing');
   const router = useRouter();
   const { data: listing, isLoading } = useListing(id);
   const { user } = useAuthStore();
@@ -36,7 +37,7 @@ function EditListingContent({ id }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">Редактировать объявление</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('editTitle')}</h1>
       <EditListingForm
         listing={listing}
         onSuccess={() => router.push(`/${locale}/listings/${id}`)}

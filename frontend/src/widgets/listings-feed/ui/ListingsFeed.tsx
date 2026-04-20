@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import { useListings } from '@entities/listing';
 import type { ListingSearchParams } from '@shared/types/api';
 
 export function ListingsFeed() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const [page, setPage] = useState(1);
 
@@ -52,12 +54,12 @@ export function ListingsFeed() {
             <SheetTrigger asChild>
               <Button variant="outline" size="sm">
                 <Filter className="size-4 mr-2" />
-                Фильтры
+                {t('common.filter')}
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
               <SheetHeader>
-                <SheetTitle>Фильтры</SheetTitle>
+                <SheetTitle>{t('common.filter')}</SheetTitle>
               </SheetHeader>
               <div className="mt-4">
                 <ListingsFilter />

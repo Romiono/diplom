@@ -33,11 +33,10 @@ export function EditListingForm({ listing, onSuccess }: Props) {
   const [title, setTitle] = useState(listing.title);
   const [description, setDescription] = useState(listing.description);
   const [price, setPrice] = useState(String(listing.price));
-  const [categoryId, setCategoryId] = useState(listing.category_id ? String(listing.category_id) : '');
-  const [condition, setCondition] = useState(listing.condition ?? '');
+  const [categoryId, setCategoryId] = useState(listing.category_id ? String(listing.category_id) : 'none');
+  const [condition, setCondition] = useState(listing.condition ?? 'none');
   const [location, setLocation] = useState(listing.location ?? '');
 
-  
   const [existingUrls, setExistingUrls] = useState<string[]>(
     listing.images.map((i) => i.image_url),
   );
@@ -70,8 +69,8 @@ export function EditListingForm({ listing, onSuccess }: Props) {
         title,
         description,
         price: parseFloat(price),
-        category_id: categoryId ? Number(categoryId) : null,
-        condition: condition || undefined,
+        category_id: categoryId !== 'none' ? Number(categoryId) : null,
+        condition: condition !== 'none' ? condition : undefined,
         location: location || undefined,
         newImages,
         existingImageUrls: existingUrls,
@@ -81,29 +80,31 @@ export function EditListingForm({ listing, onSuccess }: Props) {
   };
 
   const totalImages = existingUrls.length + newImages.length;
+  const placeholder = t('listing.form.selectPlaceholder');
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="edit-title">Название *</Label>
+        <Label htmlFor="edit-title">{t('listing.form.titleLabel')}</Label>
         <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="edit-description">Описание *</Label>
+        <Label htmlFor="edit-description">{t('listing.form.descriptionLabel')}</Label>
         <Textarea id="edit-description" rows={5} value={description} onChange={(e) => setDescription(e.target.value)} required />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="edit-price">Цена (TON) *</Label>
+          <Label htmlFor="edit-price">{t('listing.form.priceLabel')}</Label>
           <Input id="edit-price" type="number" min="0" step="0.001" value={price} onChange={(e) => setPrice(e.target.value)} required />
         </div>
         <div className="space-y-2">
-          <Label>Состояние</Label>
+          <Label>{t('listing.form.conditionLabel')}</Label>
           <Select value={condition} onValueChange={setCondition}>
-            <SelectTrigger><SelectValue placeholder="Выберите..." /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={placeholder} /></SelectTrigger>
             <SelectContent>
+              <SelectItem value="none">{t('listing.form.noCategory')}</SelectItem>
               {CONDITIONS.map((c) => (
                 <SelectItem key={c} value={c}>{t(`listing.condition.${c}`)}</SelectItem>
               ))}
@@ -112,13 +113,13 @@ export function EditListingForm({ listing, onSuccess }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Категория</Label>
+          <Label>{t('listing.form.categoryLabel')}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger><SelectValue placeholder="Выберите..." /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={placeholder} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Без категории</SelectItem>
+              <SelectItem value="none">{t('listing.form.noCategory')}</SelectItem>
               {categories?.map((c) => (
                 <SelectItem key={c.id} value={String(c.id)}>{c.icon ? `${c.icon} ` : ''}{c.name}</SelectItem>
               ))}
@@ -126,13 +127,13 @@ export function EditListingForm({ listing, onSuccess }: Props) {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="edit-location">Местоположение</Label>
+          <Label htmlFor="edit-location">{t('listing.form.locationLabel')}</Label>
           <Input id="edit-location" value={location} onChange={(e) => setLocation(e.target.value)} />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Фотографии</Label>
+        <Label>{t('listing.form.photosLabel')}</Label>
         <div className="flex flex-wrap gap-2">
           {existingUrls.map((url, i) => (
             <div key={url} className="relative size-20 rounded-md overflow-hidden border">
@@ -163,7 +164,7 @@ export function EditListingForm({ listing, onSuccess }: Props) {
 
       <div className="flex gap-3">
         <Button type="submit" disabled={isPending}>
-          {isPending ? 'Сохранение...' : t('common.save')}
+          {isPending ? t('listing.form.saving') : t('common.save')}
         </Button>
       </div>
     </form>

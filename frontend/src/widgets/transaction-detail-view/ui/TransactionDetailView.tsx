@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { MessageCircle } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useTransaction } from '@entities/transaction';
 import { TransactionStepper } from '@entities/transaction';
 import { EscrowInfo } from '@entities/blockchain';
@@ -29,6 +29,8 @@ interface Props {
 
 export function TransactionDetailView({ transactionId }: Props) {
   const locale = useLocale();
+  const t = useTranslations('transaction');
+  const tReview = useTranslations('review');
   const { data: tx, isLoading } = useTransaction(transactionId);
   const { data: reviews } = useTransactionReviews(transactionId);
   const { user } = useAuthStore();
@@ -49,12 +51,12 @@ export function TransactionDetailView({ transactionId }: Props) {
   const hasReview = reviews?.some((r) => r.reviewer_id === user.id);
   const isBuyer = user.id === tx.buyer_id;
   const counterparty = isBuyer ? tx.seller : tx.buyer;
-  const counterpartyName = counterparty?.display_name ?? counterparty?.username ?? 'Собеседник';
+  const counterpartyName = counterparty?.display_name ?? counterparty?.username ?? t('counterparty');
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Сделка</h1>
+        <h1 className="text-xl font-bold">{t('deal')}</h1>
         <StatusBadge status={tx.status} ns="transaction" />
       </div>
 
@@ -68,11 +70,11 @@ export function TransactionDetailView({ transactionId }: Props) {
         </Link>
         <p className="text-2xl font-bold mt-1">{formatTON(tx.amount)}</p>
         <p className="text-sm text-muted-foreground">
-          {isBuyer ? 'Продавец' : 'Покупатель'}:{' '}
+          {isBuyer ? t('seller') : t('buyer')}:{' '}
           {counterparty.display_name ?? counterparty.username}
         </p>
         <p className="text-xs text-muted-foreground mt-1">
-          Создана: {formatDate(tx.created_at)}
+          {t('createdAt')}: {formatDate(tx.created_at, locale)}
         </p>
       </div>
 
@@ -88,7 +90,7 @@ export function TransactionDetailView({ transactionId }: Props) {
         <DisputeDialog transaction={tx} currentUserId={user.id} />
         <Button variant="outline" size="lg" onClick={() => setChatOpen(true)}>
           <MessageCircle className="size-4 mr-2" />
-          Написать {isBuyer ? 'продавцу' : 'покупателю'}
+          {isBuyer ? t('writeToSeller') : t('writeToBuyer')}
         </Button>
       </div>
 
@@ -101,7 +103,7 @@ export function TransactionDetailView({ transactionId }: Props) {
         >
           <SheetHeader className="px-4 py-3 border-b">
             <SheetTitle className="text-sm font-medium">
-              Чат с {counterpartyName}
+              {t('chatWith', { name: counterpartyName })}
             </SheetTitle>
           </SheetHeader>
           <div className="flex-1 min-h-0">
@@ -118,7 +120,7 @@ export function TransactionDetailView({ transactionId }: Props) {
       {/* Review form after completion */}
       {tx.status === 'completed' && !hasReview && (
         <div className="border rounded-lg p-4">
-          <h3 className="font-semibold mb-4">Оставить отзыв</h3>
+          <h3 className="font-semibold mb-4">{tReview('title')}</h3>
           <CreateReviewForm
             transactionId={tx.id}
             revieweeId={isBuyer ? tx.seller_id : tx.buyer_id}
@@ -129,11 +131,11 @@ export function TransactionDetailView({ transactionId }: Props) {
       {/* Dispute info */}
       {tx.dispute_reason && (
         <div className="border border-destructive rounded-lg p-4 text-sm">
-          <p className="font-medium text-destructive">Причина спора:</p>
+          <p className="font-medium text-destructive">{t('disputeReason')}:</p>
           <p className="text-muted-foreground mt-1">{tx.dispute_reason}</p>
           {tx.dispute_opened_at && (
             <p className="text-xs mt-2">
-              Открыт: {formatDate(tx.dispute_opened_at)}
+              {t('disputeOpenedAt')}: {formatDate(tx.dispute_opened_at, locale)}
             </p>
           )}
         </div>

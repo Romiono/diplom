@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ru';
+import 'dayjs/locale/en';
 
 dayjs.extend(relativeTime);
 
@@ -26,13 +27,14 @@ export const truncateAddress = (addr: string): string =>
   addr.length > 12 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr;
 
 /**
- * Конвертирует relative URL из API в абсолютный для <Image>.
- * Backend отдаёт "/api/uploads/year/month/file.ext"
- * Результат: "http://localhost:3000/api/uploads/year/month/file.ext"
+ * Возвращает URL для <Image>.
+ * Backend отдаёт "/api/uploads/year/month/file.ext" — оставляем как есть,
+ * Next.js rewrite (/api/* → backend) подхватит его и на клиенте, и в Image Optimization.
+ * Абсолютные URL (http/https) пропускаем без изменений.
  */
 export const toAbsoluteUrl = (url: string): string => {
   if (!url) return '';
   if (url.startsWith('http')) return url;
-  const base = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api').replace(/\/api$/, '');
-  return `${base}${url}`;
+  // относительный путь — отдаём as-is, реврайт Next.js сам проксирует на бэкенд
+  return url;
 };
