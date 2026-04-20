@@ -84,6 +84,7 @@ services:
       MAX_FILE_SIZE: 5242880
       MAX_FILES: 10
       ALLOWED_MIME_TYPES: image/jpeg,image/png,image/webp
+      DB_SYNCHRONIZE: "true"
     volumes:
       - uploads:/app/uploads
     depends_on:

@@ -25,6 +25,7 @@ import { FilesModule } from './modules/files/files.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { SeederModule } from './database/seeds/seeder.module';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { AdminModule } from './modules/admin/admin.module';
     BlockchainModule,
     NotificationsModule,
     AdminModule,
+    SeederModule,
   ],
   providers: [
     {
