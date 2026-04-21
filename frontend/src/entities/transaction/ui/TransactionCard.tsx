@@ -1,4 +1,6 @@
+'use client';
 import { Link } from '@/i18n/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatusBadge } from '@shared/ui/StatusBadge';
 import { formatTON, formatRelative } from '@shared/lib/utils';
@@ -10,6 +12,9 @@ interface Props {
 }
 
 export function TransactionCard({ transaction, currentUserId }: Props) {
+  const locale = useLocale();
+  const t = useTranslations('transaction');
+
   const isBuyer = transaction.buyer_id === currentUserId;
   const counterparty = isBuyer ? transaction.seller : transaction.buyer;
   const counterpartyName =
@@ -22,9 +27,9 @@ export function TransactionCard({ transaction, currentUserId }: Props) {
           <div className="min-w-0 flex-1 space-y-1">
             <p className="font-medium text-sm truncate">{transaction.listing.title}</p>
             <p className="text-xs text-muted-foreground">
-              {isBuyer ? 'Seller' : 'Buyer'}: {counterpartyName}
+              {isBuyer ? t('seller') : t('buyer')}: {counterpartyName}
             </p>
-            <p className="text-xs text-muted-foreground">{formatRelative(transaction.created_at)}</p>
+            <p className="text-xs text-muted-foreground">{formatRelative(transaction.created_at, locale)}</p>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
             <StatusBadge status={transaction.status} ns="transaction" />

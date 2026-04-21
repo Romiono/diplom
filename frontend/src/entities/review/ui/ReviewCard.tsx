@@ -1,3 +1,5 @@
+'use client';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatRelative } from '@shared/lib/utils';
 import { UserAvatar } from '@entities/user/ui/UserAvatar';
 import { StarRating } from './StarRating';
@@ -8,7 +10,9 @@ interface Props {
 }
 
 export function ReviewCard({ review }: Props) {
-  const name = review.reviewer.display_name ?? review.reviewer.username ?? 'User';
+  const locale = useLocale();
+  const t = useTranslations('review');
+  const name = review.reviewer.display_name ?? review.reviewer.username ?? t('anonymousUser');
 
   return (
     <div className="flex gap-3 py-4 border-b last:border-0">
@@ -17,7 +21,7 @@ export function ReviewCard({ review }: Props) {
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm font-medium">{name}</span>
           <span className="text-xs text-muted-foreground shrink-0">
-            {formatRelative(review.created_at)}
+            {formatRelative(review.created_at, locale)}
           </span>
         </div>
         <StarRating value={review.rating} readonly size="sm" />

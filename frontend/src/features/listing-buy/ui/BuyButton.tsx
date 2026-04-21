@@ -24,7 +24,7 @@ export function BuyButton({ listingId, price, sellerId }: Props) {
   return (
     <Button onClick={() => mutate()} disabled={isPending} size="lg" className="w-full sm:w-auto">
       <ShoppingCart className="size-4 mr-2" />
-      {isPending ? 'Создание сделки...' : t('buy', { price: formatTON(price) })}
+      {isPending ? t('buying') : t('buy', { price: formatTON(price) })}
     </Button>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
-
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +10,8 @@ interface Props {
 }
 
 export default function Error({ error, reset }: Props) {
+  const t = useTranslations('common');
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -17,11 +19,11 @@ export default function Error({ error, reset }: Props) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center px-4">
       <AlertTriangle className="size-12 text-destructive" />
-      <h1 className="text-2xl font-bold">Что-то пошло не так</h1>
+      <h1 className="text-2xl font-bold">{t('errorTitle')}</h1>
       <p className="text-muted-foreground max-w-md">
-        {error.message || 'Произошла непредвиденная ошибка. Попробуйте обновить страницу.'}
+        {error.message || t('errorDescription')}
       </p>
-      <Button onClick={reset}>Попробовать снова</Button>
+      <Button onClick={reset}>{t('tryAgain')}</Button>
     </div>
   );
 }

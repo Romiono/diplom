@@ -13,7 +13,7 @@ export function LocaleSwitcher() {
   const toggle = () => {
     const next = locale === 'ru' ? 'en' : 'ru';
     
-    const pathWithoutLocale = rawPathname.replace(/^\/(ru|en)/, '') || '/';
+    const pathWithoutLocale = (rawPathname ?? '/').replace(/^\/(ru|en)/, '') || '/';
     router.replace(pathWithoutLocale, { locale: next });
   };
 

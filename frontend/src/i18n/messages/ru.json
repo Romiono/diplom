@@ -22,6 +22,10 @@
     "edit": "Редактировать",
     "editTitle": "Редактировать объявление",
     "delete": "Удалить",
+    "noImage": "Нет фото",
+    "noImages": "Нет фотографий",
+    "imageAlt": "{title} — фото {index}",
+    "thumbnailAlt": "Фото {index}",
     "form": {
       "titleLabel": "Название *",
       "descriptionLabel": "Описание *",
@@ -35,8 +39,15 @@
       "saving": "Сохранение..."
     },
     "buy": "Купить за {price} TON",
+    "buying": "Создание сделки...",
     "message": "Написать продавцу",
     "noListings": "Объявлений нет",
+    "tabs": {
+      "all": "Все",
+      "active": "Активные",
+      "sold": "Проданные",
+      "reserved": "Зарезервированные"
+    },
     "status": {
       "active": "Активно",
       "sold": "Продано",
@@ -79,7 +90,14 @@
     "disputeOpenedAt": "Открыт",
     "payNow": "Оплатить через TON",
     "confirmReceipt": "Подтвердить получение",
+    "confirmTitle": "Подтвердить получение?",
+    "confirmDescription": "Средства из эскроу будут переведены продавцу. Это действие нельзя отменить.",
+    "confirming": "Подтверждение...",
     "openDispute": "Открыть спор",
+    "disputeDialogDescription": "Опишите проблему. Администратор рассмотрит обращение и примет решение.",
+    "disputeReasonLabel": "Причина *",
+    "disputeReasonPlaceholder": "Опишите проблему подробно...",
+    "opening": "Открытие...",
     "purchases": "Покупки",
     "sales": "Продажи",
     "noTransactions": "Сделок нет",
@@ -107,8 +125,11 @@
     "sellerReviews": "Отзывы о продавце",
     "rating": "Оценка",
     "comment": "Комментарий",
+    "commentPlaceholder": "Напишите отзыв...",
     "submit": "Отправить отзыв",
-    "noReviews": "Отзывов нет"
+    "submitting": "Отправка...",
+    "noReviews": "Отзывов нет",
+    "anonymousUser": "Пользователь"
   },
   "message": {
     "title": "Сообщения",
@@ -116,7 +137,8 @@
     "typeMessage": "Написать сообщение...",
     "send": "Отправить",
     "toListing": "К объявлению",
-    "noMessages": "Пока нет сообщений в этом чате"
+    "noMessages": "Пока нет сообщений в этом чате",
+    "typing": "Печатает..."
   },
   "notification": {
     "title": "Уведомления",
@@ -140,8 +162,20 @@
     "sales": "Продаж",
     "purchases": "Покупок"
   },
+  "escrow": {
+    "contract": "Escrow-контракт",
+    "loading": "Загрузка контракта…",
+    "error": "Не удалось загрузить контракт",
+    "balance": "Баланс",
+    "state": "Статус"
+  },
   "home": {
     "subtitle": "Безопасная торговля с эскроу на блокчейне TON"
+  },
+  "notFound": {
+    "title": "Страница не найдена",
+    "description": "Запрошенная страница не существует или была удалена.",
+    "backHome": "На главную"
   },
   "common": {
     "loading": "Загрузка...",

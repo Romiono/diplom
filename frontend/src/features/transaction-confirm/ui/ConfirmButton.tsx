@@ -23,9 +23,9 @@ interface Props {
 
 export function ConfirmButton({ transaction, buyerId }: Props) {
   const t = useTranslations('transaction');
+  const tCommon = useTranslations('common');
   const { mutate, isPending } = useConfirmTransaction(transaction.id);
 
-  
   if (transaction.status !== 'paid' || transaction.buyer_id !== buyerId) return null;
 
   return (
@@ -38,15 +38,13 @@ export function ConfirmButton({ transaction, buyerId }: Props) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Подтвердить получение?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Средства из эскроу будут переведены продавцу. Это действие нельзя отменить.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{t('confirmTitle')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('confirmDescription')}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Отмена</AlertDialogCancel>
+          <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
           <AlertDialogAction onClick={() => mutate()} disabled={isPending}>
-            {isPending ? 'Подтверждение...' : 'Подтвердить'}
+            {isPending ? t('confirming') : tCommon('confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

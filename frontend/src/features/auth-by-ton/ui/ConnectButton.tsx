@@ -16,6 +16,7 @@ import { useAuthByTon } from '../model/useAuthByTon';
 
 export function ConnectButton() {
   const t = useTranslations('auth');
+  const tNav = useTranslations('nav');
   const { connect, disconnect, isPending } = useAuthByTon();
   const { isAuthenticated, user } = useAuthStore();
 
@@ -57,7 +58,7 @@ export function ConnectButton() {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={disconnect} className="text-destructive">
           <LogOut className="size-4 mr-2" />
-          Sign Out
+          {tNav('signOut')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

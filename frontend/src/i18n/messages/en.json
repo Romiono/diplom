@@ -22,6 +22,10 @@
     "edit": "Edit",
     "editTitle": "Edit Listing",
     "delete": "Delete",
+    "noImage": "No image",
+    "noImages": "No images",
+    "imageAlt": "{title} — image {index}",
+    "thumbnailAlt": "Thumbnail {index}",
     "form": {
       "titleLabel": "Title *",
       "descriptionLabel": "Description *",
@@ -35,8 +39,15 @@
       "saving": "Saving..."
     },
     "buy": "Buy for {price} TON",
+    "buying": "Creating transaction...",
     "message": "Message Seller",
     "noListings": "No listings found",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "sold": "Sold",
+      "reserved": "Reserved"
+    },
     "status": {
       "active": "Active",
       "sold": "Sold",
@@ -79,7 +90,14 @@
     "disputeOpenedAt": "Opened",
     "payNow": "Pay via TON",
     "confirmReceipt": "Confirm Receipt",
+    "confirmTitle": "Confirm receipt?",
+    "confirmDescription": "Funds from escrow will be transferred to the seller. This action cannot be undone.",
+    "confirming": "Confirming...",
     "openDispute": "Open Dispute",
+    "disputeDialogDescription": "Describe the problem. The administrator will review the case and make a decision.",
+    "disputeReasonLabel": "Reason *",
+    "disputeReasonPlaceholder": "Describe the problem in detail...",
+    "opening": "Opening...",
     "purchases": "Purchases",
     "sales": "Sales",
     "noTransactions": "No transactions",
@@ -107,8 +125,11 @@
     "sellerReviews": "Seller Reviews",
     "rating": "Rating",
     "comment": "Comment",
+    "commentPlaceholder": "Write a review...",
     "submit": "Submit Review",
-    "noReviews": "No reviews yet"
+    "submitting": "Submitting...",
+    "noReviews": "No reviews yet",
+    "anonymousUser": "User"
   },
   "message": {
     "title": "Messages",
@@ -116,7 +137,8 @@
     "typeMessage": "Type a message...",
     "send": "Send",
     "toListing": "Go to listing",
-    "noMessages": "No messages in this chat yet"
+    "noMessages": "No messages in this chat yet",
+    "typing": "Typing..."
   },
   "notification": {
     "title": "Notifications",
@@ -140,8 +162,20 @@
     "sales": "Sales",
     "purchases": "Purchases"
   },
+  "escrow": {
+    "contract": "Escrow Contract",
+    "loading": "Loading contract state…",
+    "error": "Failed to load contract state",
+    "balance": "Balance",
+    "state": "State"
+  },
   "home": {
     "subtitle": "Secure trading with escrow on the TON blockchain"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The requested page does not exist or has been deleted.",
+    "backHome": "Back to home"
   },
   "common": {
     "loading": "Loading...",

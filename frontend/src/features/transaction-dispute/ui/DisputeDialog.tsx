@@ -24,11 +24,11 @@ interface Props {
 
 export function DisputeDialog({ transaction, currentUserId }: Props) {
   const t = useTranslations('transaction');
+  const tCommon = useTranslations('common');
   const { mutate, isPending } = useOpenDispute(transaction.id);
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
 
-  
   const canDispute =
     transaction.status === 'paid' &&
     (transaction.buyer_id === currentUserId || transaction.seller_id === currentUserId);
@@ -50,29 +50,27 @@ export function DisputeDialog({ transaction, currentUserId }: Props) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Открыть спор</DialogTitle>
-          <DialogDescription>
-            Опишите проблему. Администратор рассмотрит обращение и примет решение.
-          </DialogDescription>
+          <DialogTitle>{t('openDispute')}</DialogTitle>
+          <DialogDescription>{t('disputeDialogDescription')}</DialogDescription>
         </DialogHeader>
         <div className="space-y-2 py-2">
-          <Label htmlFor="dispute-reason">Причина *</Label>
+          <Label htmlFor="dispute-reason">{t('disputeReasonLabel')}</Label>
           <Textarea
             id="dispute-reason"
             rows={4}
-            placeholder="Опишите проблему подробно..."
+            placeholder={t('disputeReasonPlaceholder')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Отмена</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>{tCommon('cancel')}</Button>
           <Button
             variant="destructive"
             onClick={handleSubmit}
             disabled={isPending || !reason.trim()}
           >
-            {isPending ? 'Открытие...' : 'Открыть спор'}
+            {isPending ? t('opening') : t('openDispute')}
           </Button>
         </DialogFooter>
       </DialogContent>

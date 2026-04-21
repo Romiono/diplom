@@ -2,7 +2,7 @@
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { MapPin, Eye } from 'lucide-react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatusBadge } from '@shared/ui/StatusBadge';
 import { formatTON, formatRelative } from '@shared/lib/utils';
@@ -16,6 +16,7 @@ interface Props {
 
 export function ListingCard({ listing, actions }: Props) {
   const locale = useLocale();
+  const t = useTranslations('listing');
   const imageUrl = getPrimaryImage(listing);
   const seller = listing.seller;
   const sellerName = seller
@@ -36,7 +37,7 @@ export function ListingCard({ listing, actions }: Props) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
-              No image
+              {t('noImage')}
             </div>
           )}
           <div className="absolute top-2 left-2">

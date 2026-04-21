@@ -1,3 +1,5 @@
+'use client';
+import { useTranslations } from 'next-intl';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import { truncateAddress } from '@shared/lib/utils';
 import { useEscrowState } from '../model/queries';
@@ -7,6 +9,7 @@ interface Props {
 }
 
 export function EscrowInfo({ contractAddress }: Props) {
+  const t = useTranslations('escrow');
   const { data, isLoading, isError } = useEscrowState(contractAddress);
   const explorerUrl = `https://testnet.tonscan.org/address/${contractAddress}`;
 
@@ -14,7 +17,7 @@ export function EscrowInfo({ contractAddress }: Props) {
     <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Escrow Contract
+          {t('contract')}
         </span>
         <a
           href={explorerUrl}
@@ -30,22 +33,21 @@ export function EscrowInfo({ contractAddress }: Props) {
       {isLoading && (
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Loader2 className="size-3 animate-spin" />
-          Loading contract state…
+          {t('loading')}
         </div>
       )}
 
       {isError && (
-        <p className="text-xs text-destructive">Failed to load contract state</p>
+        <p className="text-xs text-destructive">{t('error')}</p>
       )}
 
       {data && (
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-          <span className="text-muted-foreground">Balance</span>
-          {/* backend returns amount already in TON (not nanoton) */}
+          <span className="text-muted-foreground">{t('balance')}</span>
           <span className="font-medium">{Number(data.amount).toFixed(4)} TON</span>
           {data.status && (
             <>
-              <span className="text-muted-foreground">State</span>
+              <span className="text-muted-foreground">{t('state')}</span>
               <span className="font-medium capitalize">{String(data.status)}</span>
             </>
           )}

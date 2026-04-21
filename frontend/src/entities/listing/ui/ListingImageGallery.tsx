@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { cn, toAbsoluteUrl } from '@shared/lib/utils';
 import { getSortedImages } from '../lib/listing.utils';
 import type { Listing } from '@shared/types/api';
@@ -10,13 +11,14 @@ interface Props {
 }
 
 export function ListingImageGallery({ listing }: Props) {
+  const t = useTranslations('listing');
   const images = getSortedImages(listing);
   const [activeIdx, setActiveIdx] = useState(0);
 
   if (!images.length) {
     return (
       <div className="aspect-square bg-muted rounded-xl flex items-center justify-center text-muted-foreground">
-        No images
+        {t('noImages')}
       </div>
     );
   }
@@ -28,7 +30,7 @@ export function ListingImageGallery({ listing }: Props) {
       <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
         <Image
           src={activeUrl}
-          alt={`${listing.title} — image ${activeIdx + 1}`}
+          alt={t('imageAlt', { title: listing.title, index: activeIdx + 1 })}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
@@ -36,7 +38,6 @@ export function ListingImageGallery({ listing }: Props) {
         />
       </div>
 
-      {/* Thumbnails */}
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">
           {images.map((img, i) => (
@@ -50,7 +51,7 @@ export function ListingImageGallery({ listing }: Props) {
             >
               <Image
                 src={toAbsoluteUrl(img.image_url)}
-                alt={`Thumbnail ${i + 1}`}
+                alt={t('thumbnailAlt', { index: i + 1 })}
                 fill
                 className="object-cover"
                 sizes="64px"

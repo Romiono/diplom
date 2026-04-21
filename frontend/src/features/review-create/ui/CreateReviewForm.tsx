@@ -39,13 +39,13 @@ export function CreateReviewForm({ transactionId, revieweeId, onSuccess }: Props
         <Textarea
           id="review-comment"
           rows={3}
-          placeholder="Напишите отзыв..."
+          placeholder={t('commentPlaceholder')}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
       </div>
       <Button type="submit" disabled={isPending || rating === 0}>
-        {isPending ? 'Отправка...' : t('submit')}
+        {isPending ? t('submitting') : t('submit')}
       </Button>
     </form>
   );

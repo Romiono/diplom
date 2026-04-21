@@ -60,15 +60,17 @@ export function CreateListingForm() {
     });
   };
 
+  const placeholder = t('listing.form.selectPlaceholder');
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
       <div className="space-y-2">
-        <Label htmlFor="title">Название *</Label>
+        <Label htmlFor="title">{t('listing.form.titleLabel')}</Label>
         <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Описание *</Label>
+        <Label htmlFor="description">{t('listing.form.descriptionLabel')}</Label>
         <Textarea
           id="description"
           rows={5}
@@ -80,7 +82,7 @@ export function CreateListingForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="price">Цена (TON) *</Label>
+          <Label htmlFor="price">{t('listing.form.priceLabel')}</Label>
           <Input
             id="price"
             type="number"
@@ -92,10 +94,10 @@ export function CreateListingForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label>Состояние</Label>
+          <Label>{t('listing.form.conditionLabel')}</Label>
           <Select value={condition} onValueChange={setCondition}>
             <SelectTrigger>
-              <SelectValue placeholder="Выберите..." />
+              <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
               {CONDITIONS.map((c) => (
@@ -108,10 +110,10 @@ export function CreateListingForm() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Категория</Label>
+          <Label>{t('listing.form.categoryLabel')}</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
             <SelectTrigger>
-              <SelectValue placeholder="Выберите..." />
+              <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
               {categories?.map((c) => (
@@ -123,14 +125,13 @@ export function CreateListingForm() {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="location">Местоположение</Label>
+          <Label htmlFor="location">{t('listing.form.locationLabel')}</Label>
           <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} />
         </div>
       </div>
 
-      {/* Image upload */}
       <div className="space-y-2">
-        <Label>Фотографии (до 10)</Label>
+        <Label>{t('listing.form.photosLabel')}</Label>
         <div className="flex flex-wrap gap-2">
           {previews.map((src, i) => (
             <div key={i} className="relative size-20 rounded-md overflow-hidden border">
@@ -166,7 +167,7 @@ export function CreateListingForm() {
       </div>
 
       <Button type="submit" disabled={isPending} className="w-full sm:w-auto">
-        {isPending ? 'Сохранение...' : t('listing.create')}
+        {isPending ? t('listing.form.saving') : t('listing.create')}
       </Button>
     </form>
   );
