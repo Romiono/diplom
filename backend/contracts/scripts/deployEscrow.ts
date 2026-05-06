@@ -3,16 +3,11 @@ import { Escrow } from '../wrappers/Escrow';
 import { compile, NetworkProvider } from '@ton/blueprint';
 
 export async function run(provider: NetworkProvider) {
-  // Example deployment
-  // In production, these addresses should come from environment or parameters
-
   const sellerAddress = Address.parse(
     'EQD..._seller_address_here_...',
-  ); // Replace with actual seller address
+  );
   const buyerAddress = Address.parse('EQD..._buyer_address_here_...');
-// Replace with actual buyer address
   const adminAddress = Address.parse('EQD..._admin_address_here_...');
-// Replace with actual admin address
 
   const amount = toNano('1'); // 1 TON
   const timeout = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days from now

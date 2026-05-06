@@ -6,22 +6,21 @@ services:
     image: traefik:v2.11
     restart: unless-stopped
     command:
-      - --log.level=DEBUG
+      - --log.level=INFO
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      - --providers.file.filename=/etc/traefik/dynamic.yml
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
-      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
-      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - letsencrypt:/letsencrypt
+      - /opt/traefik/certs:/certs:ro
+      - /opt/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
 
   postgres:
     image: postgres:14-alpine
@@ -96,7 +95,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.backend.rule=Host(`${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/socket.io`))
       - traefik.http.routers.backend.entrypoints=websecure
-      - traefik.http.routers.backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.backend.tls=true
       - traefik.http.routers.backend.priority=10
       - traefik.http.services.backend.loadbalancer.server.port=3000
       - traefik.http.services.backend.loadbalancer.sticky.cookie=true
@@ -121,11 +120,10 @@ services:
       - traefik.enable=true
       - traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.frontend.entrypoints=websecure
-      - traefik.http.routers.frontend.tls.certresolver=letsencrypt
+      - traefik.http.routers.frontend.tls=true
       - traefik.http.routers.frontend.priority=1
       - traefik.http.services.frontend.loadbalancer.server.port=3001
 
 volumes:
   postgres_data:
   uploads:
-  letsencrypt:
