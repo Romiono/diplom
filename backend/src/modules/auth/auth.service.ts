@@ -100,7 +100,6 @@ export class AuthService {
     domainLen: number,
   ): boolean {
     try {
-      // Reject proofs older than 5 minutes
       const now = Math.floor(Date.now() / 1000);
       if (Math.abs(now - timestamp) > 300) return false;
 

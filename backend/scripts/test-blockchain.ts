@@ -1,10 +1,3 @@
-/**
- * Скрипт для тестирования взаимодействия с TON блокчейном
- *
- * Использование:
- * ts-node -r tsconfig-paths/register scripts/test-blockchain.ts
- */
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { EscrowService } from '../src/modules/blockchain/services/escrow.service';
@@ -13,7 +6,6 @@ import { TonClientService } from '../src/modules/blockchain/services/ton-client.
 async function testBlockchain() {
   console.log('🚀 Starting TON Blockchain Integration Test...\n');
 
-  // Создаем приложение
   const app = await NestFactory.createApplicationContext(AppModule);
 
   const escrowService = app.get(EscrowService);
@@ -43,22 +35,6 @@ async function testBlockchain() {
     console.log('- Compiled contract (npm run contract:compile)');
     console.log('- Admin wallet mnemonic in .env');
     console.log('- Sufficient balance on admin wallet (>0.1 TON)\n');
-
-    /*
-    const contractAddress = await escrowService.deployEscrow({
-      sellerAddress: SELLER_ADDRESS,
-      buyerAddress: BUYER_ADDRESS,
-      amount: 1, // 1 TON
-      timeoutSeconds: 30 * 24 * 60 * 60, // 30 days
-    });
-
-    console.log(`✅ Contract deployed at: ${contractAddress}\n`);
-
-    // 5. Получение состояния контракта
-    console.log('5️⃣ Getting contract state...');
-    const state = await escrowService.getContractState(contractAddress);
-    console.log('Contract state:', JSON.stringify(state, null, 2));
-    */
 
     console.log('✅ All tests completed successfully!');
     console.log('\n📝 Next steps:');

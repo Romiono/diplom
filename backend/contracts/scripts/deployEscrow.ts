@@ -9,8 +9,8 @@ export async function run(provider: NetworkProvider) {
   const buyerAddress = Address.parse('EQD..._buyer_address_here_...');
   const adminAddress = Address.parse('EQD..._admin_address_here_...');
 
-  const amount = toNano('1'); // 1 TON
-  const timeout = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days from now
+  const amount = toNano('1');
+  const timeout = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
 
   const escrow = Escrow.createFromConfig(
     {

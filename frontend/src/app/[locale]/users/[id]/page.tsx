@@ -19,7 +19,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       return { title: `${name} — TON Market` };
     }
   } catch {
-    // fall through to default
   }
   return { title: 'Профиль пользователя — TON Market' };
 }

@@ -49,9 +49,6 @@ export class TonClientService {
     }
   }
 
-  /**
-   * Проверяет, задеплоен ли контракт по адресу
-   */
   async isContractDeployed(address: string): Promise<boolean> {
     try {
       const client = await this.getClient();
@@ -63,9 +60,6 @@ export class TonClientService {
     }
   }
 
-  /**
-   * Получает информацию о последних транзакциях
-   */
   async getTransactions(
     address: string,
     limit: number = 10,

@@ -26,7 +26,6 @@ class ErrorBoundaryBase extends Component<BoundaryProps, State> {
   }
 
   componentDidCatch() {
-    // можно логировать в Sentry и т.д.
   }
 
   render() {

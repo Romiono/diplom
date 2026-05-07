@@ -17,6 +17,13 @@ try {
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['10.0.158.126', '10.133.132.229', '192.168.0.101'],
+  webpack(config) {
+    if (config.optimization?.splitChunks && config.optimization.splitChunks !== false) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (config.optimization.splitChunks as any).automaticNameDelimiter = '-';
+    }
+    return config;
+  },
   async rewrites() {
     return [
       {

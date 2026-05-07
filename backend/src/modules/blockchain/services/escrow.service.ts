@@ -254,9 +254,6 @@ export class EscrowService implements OnModuleInit {
     }
   }
 
-  /**
-   * Ждем подтверждения деплоя контракта
-   */
   private async waitForDeployment(
     contractAddress: string,
     timeout: number = 30000,

@@ -66,7 +66,7 @@ export class Escrow implements Contract {
   // OP 2: Release funds to seller
   async sendRelease(provider: ContractProvider, via: Sender) {
     await provider.internal(via, {
-      value: toNano('0.05'), // Gas fee
+      value: toNano('0.05'),
       sendMode: SendMode.PAY_GAS_SEPARATELY,
       body: beginCell().storeUint(2, 32).endCell(),
     });
@@ -75,13 +75,11 @@ export class Escrow implements Contract {
   // OP 3: Refund to buyer
   async sendRefund(provider: ContractProvider, via: Sender) {
     await provider.internal(via, {
-      value: toNano('0.05'), // Gas fee
+      value: toNano('0.05'),
       sendMode: SendMode.PAY_GAS_SEPARATELY,
       body: beginCell().storeUint(3, 32).endCell(),
     });
   }
-
-  // GET methods
 
   async getStatus(provider: ContractProvider): Promise<number> {
     const result = await provider.get('get_status', []);

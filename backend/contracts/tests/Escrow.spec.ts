@@ -23,7 +23,7 @@ describe('Escrow', () => {
     buyer = await blockchain.treasury('buyer');
     admin = await blockchain.treasury('admin');
 
-    const timeout = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30 days
+    const timeout = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
 
     escrow = blockchain.openContract(
       Escrow.createFromConfig(
@@ -82,29 +82,22 @@ describe('Escrow', () => {
   });
 
   it('buyer should release funds to seller', async () => {
-    // First fund
     await escrow.sendFund(buyer.getSender(), toNano('10'));
 
-    // Get seller balance before
     const sellerBalanceBefore = await seller.getBalance();
 
-    // Release
     await escrow.sendRelease(buyer.getSender());
 
-    // Check status
     const status = await escrow.getStatus();
     expect(status).toEqual(EscrowStatus.RELEASED);
 
-    // Check seller received funds
     const sellerBalanceAfter = await seller.getBalance();
     expect(sellerBalanceAfter).toBeGreaterThan(sellerBalanceBefore);
   });
 
   it('admin should release funds to seller', async () => {
-    // First fund
     await escrow.sendFund(buyer.getSender(), toNano('10'));
 
-    // Admin releases
     await escrow.sendRelease(admin.getSender());
 
     const status = await escrow.getStatus();
@@ -112,20 +105,15 @@ describe('Escrow', () => {
   });
 
   it('admin should refund buyer', async () => {
-    // First fund
     await escrow.sendFund(buyer.getSender(), toNano('10'));
 
-    // Get buyer balance before
     const buyerBalanceBefore = await buyer.getBalance();
 
-    // Admin refunds
     await escrow.sendRefund(admin.getSender());
 
-    // Check status
     const status = await escrow.getStatus();
     expect(status).toEqual(EscrowStatus.REFUNDED);
 
-    // Check buyer received refund
     const buyerBalanceAfter = await buyer.getBalance();
     expect(buyerBalanceAfter).toBeGreaterThan(buyerBalanceBefore);
   });
@@ -155,17 +143,14 @@ describe('Escrow', () => {
   it('should return excess if overpaid', async () => {
     const buyerBalanceBefore = await buyer.getBalance();
 
-    // Send more than required
     await escrow.sendFund(buyer.getSender(), toNano('15'));
 
     const status = await escrow.getStatus();
     expect(status).toEqual(EscrowStatus.FUNDED);
 
-    // Buyer should receive excess back (minus gas fees)
     const buyerBalanceAfter = await buyer.getBalance();
     const spent = buyerBalanceBefore - buyerBalanceAfter;
 
-    // Should spend approximately 10 TON + gas fees
     expect(spent).toBeLessThan(toNano('11'));
     expect(spent).toBeGreaterThan(toNano('10'));
   });
@@ -173,14 +158,11 @@ describe('Escrow', () => {
   it('should allow refund after timeout', async () => {
     await escrow.sendFund(buyer.getSender(), toNano('10'));
 
-    // Fast-forward time by 31 days
     blockchain.now = Math.floor(Date.now() / 1000) + 31 * 24 * 60 * 60;
 
-    // Check timeout passed
     const timeoutPassed = await escrow.isTimeoutPassed();
     expect(timeoutPassed).toBe(true);
 
-    // Anyone can trigger refund after timeout
     const stranger = await blockchain.treasury('stranger');
     await escrow.sendRefund(stranger.getSender());
 
